@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from django.conf import settings
+from django.template.loader import render_to_string
 from django.test import SimpleTestCase
 
 
@@ -17,7 +18,24 @@ class HorizontalScrollContractTests(SimpleTestCase):
         self.assertIn('data-horizontal-drag="true"', row)
         self.assertIn('tabindex="0"', row)
         self.assertIn('role="region"', row)
-        self.assertIn('aria-label="{{ row.title|default:row.title_main }}"', row)
+        self.assertIn('aria-label="{{ row_aria_label }}"', row)
+
+    def test_shared_row_renders_aria_label_when_title_main_is_absent(self):
+        content = render_to_string(
+            "app/components/_scrollable_row.html",
+            {
+                "hide_heading": True,
+                "row": {
+                    "row_id": "test-row",
+                    "title": "Test row",
+                    "items": [],
+                    "loaded_count": 0,
+                    "total": 0,
+                },
+            },
+        )
+
+        self.assertIn('aria-label="Test row"', content)
 
     def test_base_loads_the_horizontal_drag_controller_once(self):
         base = self.read("templates/base.html")

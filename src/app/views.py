@@ -2015,7 +2015,6 @@ def service_worker(request):
 
 
 __all__ = [
-    "anime_seasons_page",
     "DETAIL_EPISODES_PER_PAGE",
     "DETAIL_SECONDARY_FRAGMENT",
     "DISCOVER_ALLOWED_MEDIA_TYPES",
@@ -2194,6 +2193,7 @@ __all__ = [
     "album_track_modal",
     "anime_mapping",
     "anime_migration",
+    "anime_seasons_page",
     "app_tags",
     "artist_delete",
     "artist_detail",

@@ -176,6 +176,18 @@ function runtimeMinutes(value) {
   return /^\d+$/.test(text.trim()) ? Number(text) : 0;
 }
 
+// The detail serializer reports max_progress 1 when the provider knows no length. Games have
+// none, and books, manga, comics and board games without a known count get the same
+// placeholder, which capped every stored total at 1 so no status change could be saved.
+const PLACEHOLDER_MAX_TYPES = new Set(['book', 'manga', 'comic', 'boardgame']);
+function progressMax(mediaType, detail) {
+  if (mediaType === 'game') return null;
+  const max = detail && detail.max_progress ? Number(detail.max_progress) : null;
+  if (!max) return null;
+  if (max <= 1 && PLACEHOLDER_MAX_TYPES.has(mediaType)) return null;
+  return max;
+}
+
 function trackFields(identity, detail, consumption, withTime = false, scaleMax = 10) {
   const mediaType = identity.mediaType;
   const fields = [
@@ -195,7 +207,7 @@ function trackFields(identity, detail, consumption, withTime = false, scaleMax =
     fields.push(field('progress', 'Progress', 'number', consumption?.progress ?? (mediaType === 'comicissue' ? 0 : ''), {
       min: 0,
       unit: mediaType === 'game' ? 'minutes' : '',
-      max: detail && detail.max_progress ? detail.max_progress : null,
+      max: progressMax(mediaType, detail),
       help: detail && detail.progress_unit ? String(detail.progress_unit) : '',
     }));
   }

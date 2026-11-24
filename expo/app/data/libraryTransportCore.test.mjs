@@ -50,6 +50,17 @@ test('payload rows retain real tracker identity and map to card shapes', () => {
   assert.equal(card.rating.value, 8);
 });
 
+test('game and board game covers are posters like on the server; only videos are wide', () => {
+  const shapeOf = mediaType => mediaCardModelFromRow(mediaRowsFromPayload({ results: [{
+    id: 1, item_id: 1, tracked: true, status: 1,
+    item: { media_type: mediaType, library_media_type: mediaType, source: 'x', media_id: '1', title: 'T' },
+  }] })[0].media).shape;
+  assert.equal(shapeOf('game'), 'poster');
+  assert.equal(shapeOf('boardgame'), 'poster');
+  assert.equal(shapeOf('video'), 'landscape');
+  assert.equal(shapeOf('music'), 'square');
+});
+
 test('card projection keeps missing artwork, score and progress nullable', () => {
   const card = mediaCardModelFromRow({ item: { media_type: 'music', title: 'Untitled' }, tracked: false });
   assert.equal(card.shape, 'square');
@@ -156,6 +167,10 @@ test('podcast shows map to show rows and card actions carry the item identity', 
   const actions = cardActionsFor('The Matrix', identity);
   assert.deepEqual(actions.items.map(item => item.modal || item.href), ['track', 'lists', '/history']);
   assert.equal(actions.media, identity);
+  // The first tap reveals these actions unless the person chose clickable cards.
+  assert.equal(actions.clickable, false);
+  assert.deepEqual(actions.items.map(item => item.tone), ['indigo', 'emerald', 'amber']);
+  assert.equal(cardActionsFor('The Matrix', identity, { clickable: true }).clickable, true);
 });
 
 test('library cards load the server card size and keep the full image for Detail', () => {

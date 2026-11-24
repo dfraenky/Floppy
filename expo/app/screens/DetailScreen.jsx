@@ -339,7 +339,9 @@ export default function DetailScreen({ params, onBack, navigate }) {
   }
 
   return <Screen onBack={onBack} chrome={false} artworkBleed
-    contentStyle={{ paddingTop: heroViewport.headerHeight }}>
+    contentStyle={{ paddingTop: heroViewport.headerHeight }}
+    onScroll={shellLayout?.onContentScroll
+      ? event => shellLayout.onContentScroll(event.nativeEvent.contentOffset.y) : undefined}>
     <DetailView
       model={viewModel}
       heroViewport={heroViewport}

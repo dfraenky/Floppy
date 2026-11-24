@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, Platform, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDevicePose } from '../data/useDevicePose';
 import { useVerticalBarEdgeIOS } from 'expo-status-bar';
@@ -18,6 +18,7 @@ import SearchSlot from './SearchSlot';
 import { getShellPageType, subscribeShellPageType, ShellLayoutContext } from './shellContext';
 import NativeShell from './NativeShell';
 import { horizontalContentPadding } from '../safeAreaSpacing.mjs';
+import { statusBarInset } from '../status-bar-inset';
 import { palette, radius } from '../theme';
 
 export const surface = {
@@ -159,6 +160,10 @@ export default function ShellSlot({
   const [pinned, setPinned] = useState([]);
   const [detailViewport, setDetailViewport] = useState({ width: 0, height: 0 });
   const [detailHeaderHeight, setDetailHeaderHeight] = useState(64);
+  // Detail artwork runs under the transparent search bar; once the page scrolls,
+  // the bar gets a solid backing so text never passes behind it unreadably.
+  const [scrolledUnder, setScrolledUnder] = useState(false);
+  const headerBacking = useRef(new Animated.Value(0)).current;
   const pose = useDevicePose();
   const railEdge = useVerticalBarEdgeIOS();
   const insets = useSafeAreaInsets();
@@ -253,6 +258,15 @@ export default function ShellSlot({
     if (item?.href) onOpenHref?.(item.href, item);
   };
 
+  useEffect(() => { setScrolledUnder(false); }, [activeHref, overlaySearch]);
+  useEffect(() => {
+    Animated.timing(headerBacking, { toValue: scrolledUnder ? 1 : 0, duration: 160, useNativeDriver: true }).start();
+  }, [scrolledUnder, headerBacking]);
+  const onContentScroll = useMemo(() => y => setScrolledUnder(y > 8), []);
+  // The drawer is a modal drawn under the system bars; the root's top padding
+  // (StatusBar.currentHeight) is the reliable status bar height on Android.
+  const drawerInsets = { top: Math.max(insets.top, statusBarInset), bottom: insets.bottom };
+
   const navigationPadding = horizontalContentPadding(insets, 16);
   const adaptivePalette = Platform.OS === 'ios' && (pose.hasHinge || railEdge)
     ? { ...shellPalette, navRowHeight: 44, navContentPaddingTop: 25,
@@ -316,7 +330,7 @@ export default function ShellSlot({
     </NativeShell>;
   }
 
-  const shell = <Shell
+  const shellRow = <Shell
     open={open}
     onToggleMenu={() => setOpen(value => !value)}
     onCloseMenu={() => setOpen(false)}
@@ -328,21 +342,39 @@ export default function ShellSlot({
     search={search}
     labels={labels}
     palette={shellPalette}
+    insets={drawerInsets}
   >
     {sidebar}
   </Shell>;
+  // The web top bar pads its row by 1rem on each side; the shared Shell row has
+  // none, so the native bar adds it here. The menu button's 36px box centres a
+  // 22px glyph, so the left side is 7px short to line the glyph up with the
+  // page's 16px gutter.
+  const shell = <View style={{ paddingLeft: 9 + (insets.left || 0), paddingRight: 16 + (insets.right || 0) }}>{shellRow}</View>;
   if (!overlaySearch) return <>{shell}{content}</>;
   // Android also lets detail artwork continue under search; other pages keep the reviewed shell.
   return <View style={{ flex: 1 }} onLayout={event => setDetailViewport(event.nativeEvent.layout)}>
-    <ShellLayoutContext.Provider value={{ ...detailViewport, insets, headerHeight: detailHeaderHeight }}>
+    <ShellLayoutContext.Provider value={{ ...detailViewport, insets, headerHeight: detailHeaderHeight, onContentScroll }}>
       <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 30 }}
-        onLayout={event => setDetailHeaderHeight(event.nativeEvent.layout.height)}>{shell}</View>
+        onLayout={event => setDetailHeaderHeight(event.nativeEvent.layout.height)}>
+        {/* Reaches up over the status bar, where the artwork bleeds too. */}
+        <Animated.View pointerEvents="none" style={[styles.headerBacking, {
+          top: -statusBarInset, opacity: headerBacking,
+        }]} />
+        {shell}
+      </View>
       {content}
     </ShellLayoutContext.Provider>
   </View>;
 }
 
 const styles = StyleSheet.create({
+  headerBacking: {
+    position: 'absolute', left: 0, right: 0, bottom: 0,
+    backgroundColor: palette.background,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: palette.border,
+  },
   navStatus: { color: palette.textMuted, fontSize: 13, lineHeight: 19 },
   navError: {
     borderWidth: 1,

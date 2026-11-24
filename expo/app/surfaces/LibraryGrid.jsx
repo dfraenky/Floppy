@@ -4,7 +4,7 @@ import { MediaCard } from '../../../frontend/ui/MediaCard';
 import { mediaCardPalette, spacing } from '../theme';
 import { cardActionsFor, mediaCardModelFromRow } from '../data/libraryTransportCore';
 import MediaCardSlot from './MediaCardSlot';
-import { useMobileGridLayout } from '../data/useMobileGridLayout';
+import { useClickableMediaCards, useMobileGridLayout } from '../data/useMobileGridLayout';
 
 const NO_ROWS = [];
 
@@ -16,20 +16,24 @@ export default function LibraryGrid({
 }) {
   const { width } = useWindowDimensions();
   const mobileGridLayout = useMobileGridLayout();
+  const clickable = useClickableMediaCards();
   const scrolls = header !== undefined || footer !== undefined;
   const itemCards = groupBy === 'item' && !rows.some(row => row.identity?.entityType);
   // Built once per row set, so appending a page keeps the existing card models
   // (and their memoized cards) instead of rebuilding every one.
-  const built = useRef(new WeakMap());
+  // A change of the clickable preference starts a fresh cache.
+  const built = useRef({ clickable, cards: new WeakMap() });
+  if (built.current.clickable !== clickable) built.current = { clickable, cards: new WeakMap() };
   const items = useMemo(() => (itemCards ? rows.map(row => {
-    let item = built.current.get(row);
+    let item = built.current.cards.get(row);
     if (!item) {
       const model = mediaCardModelFromRow(row.media || row);
-      item = { key: String(row.id), row, model: { ...model, identity: row.identity, actions: cardActionsFor(model.title, row.identity) } };
-      built.current.set(row, item);
+      item = { key: String(row.id), row, model: { ...model, identity: row.identity,
+        actions: cardActionsFor(model.title, row.identity, { clickable }) } };
+      built.current.cards.set(row, item);
     }
     return item;
-  }) : NO_ROWS), [rows, itemCards]);
+  }) : NO_ROWS), [rows, itemCards, clickable]);
   // Tracked items carry the web card's own actions (tracking, lists, history, rating),
   // so they are handled in place. Artists, albums and shows keep the plain card.
   if (itemCards) {

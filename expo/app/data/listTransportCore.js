@@ -164,7 +164,8 @@ export function listItemsFromPayload(payload, offset = 0) {
       rank: entry.rank == null ? offset + index + 1 : Number(entry.rank) || offset + index + 1,
       cardShape: ['music', 'podcast'].includes(mediaType)
         ? 'square'
-        : ['game', 'video'].includes(mediaType) ? 'landscape' : 'poster',
+        // Game covers are posters, as on the server (`card_shape`) and the web grid.
+        : mediaType === 'video' ? 'landscape' : 'poster',
       image: { src: item.image || null, fallback: '', source: 'primary' },
       identity: {
         mediaType,

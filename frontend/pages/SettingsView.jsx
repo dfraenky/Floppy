@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { Icon } from '../ui/Icon';
 import { SettingsNavLink } from './SettingsNavLink';
@@ -76,9 +76,12 @@ export function SettingsNav({
   icons = {},
   renderIcon,
   collapsible = false,
+  onOpenChange,
 }) {
   const copy = { ...settingsLabels, ...(labels || {}) };
   const [open, setOpen] = useState(false);
+  // A native host hides its floating save bar while the section list is open.
+  useEffect(() => { onOpenChange?.(open); }, [open, onOpenChange]);
   const activeItem = navigation.flatMap(group => group.items)
     .find(item => item.page === active || item.id === active);
   const menuLabel = activeItem?.label || copy.menu;
@@ -135,6 +138,7 @@ export function SettingsView({
   icons = {},
   renderIcon,
   collapsible,
+  onMenuOpenChange,
   children,
 }) {
   const copy = { ...settingsLabels, ...(labels || {}) };
@@ -151,7 +155,7 @@ export function SettingsView({
         <SettingsNav navigation={navigation} active={active} onNavigate={onNavigate}
           permissions={permissions} availablePages={availablePages} labels={labels}
           palette={palette} icons={icons} renderIcon={renderIcon}
-          collapsible={menuCollapsible} />
+          collapsible={menuCollapsible} onOpenChange={onMenuOpenChange} />
       </View>
       <View style={styles.contentColumn}>{children}</View>
     </View>

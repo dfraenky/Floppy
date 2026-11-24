@@ -1,4 +1,5 @@
 import { getActiveAuthSession } from './authSession.js';
+import { forgetCardPreferences } from './cardPreferenceCache.js';
 import { createLocalSettingsActions, createRemoteSettingsActions } from './settingsTransportCore.js';
 
 export function createSettingsTransport(options = {}) {
@@ -9,6 +10,13 @@ export function createSettingsTransport(options = {}) {
   if (auth && typeof auth.request === 'function') {
     const actions = createRemoteSettingsActions(auth.request, { authType: auth.getState?.()?.authType || auth.authType || 'token' });
     actions.serverUrl = auth.getState?.()?.serverUrl || auth.serverUrl || '';
+    // Card surfaces cache the preferences read; a save makes them read again.
+    for (const name of ['savePreferences', 'saveCards']) {
+      const save = actions[name];
+      if (typeof save === 'function') {
+        actions[name] = (...args) => Promise.resolve(save(...args)).finally(forgetCardPreferences);
+      }
+    }
     return actions;
   }
   return createLocalSettingsActions(

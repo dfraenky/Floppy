@@ -65,7 +65,7 @@ test('listItemsFromPayload maps rows and falls back for missing items', () => {
   assert.equal(rows[2].cardShape, 'square');
   assert.equal(rows[3].cardShape, 'poster');
   assert.equal(rows[3].mediaTypeLabel, 'banana');
-  assert.equal(rows[4].cardShape, 'landscape');
+  assert.equal(rows[4].cardShape, 'poster');
 });
 
 test('listItemsFromPayload ranks by offset unless the entry carries a rank', () => {

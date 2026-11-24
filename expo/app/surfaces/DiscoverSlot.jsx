@@ -9,6 +9,7 @@ import { DiscoverListPicker } from './DiscoverListPicker';
 import { defaultLabels } from '../../../frontend/discover/DiscoverScreen';
 import { mediaCardPalette, palette } from '../theme';
 import { getActiveAuthSession, subscribeAuthSession } from '../data/authSession';
+import { useClickableMediaCards } from '../data/useMobileGridLayout';
 import { listsFromPayload } from '../data/listTransportCore';
 import {
   createDiscoverTransport,
@@ -68,9 +69,14 @@ export function useDiscoverSurface({ navigate, transport: injectedTransport } = 
   const display = useAccountDisplay();
   // The web card hides its year and match line on a compact phone grid.
   const bare = width <= 768 && display.compact;
-  const rows = useMemo(() => (bare
-    ? rawRows.map(row => ({ ...row, items: row.items.map(item => ({ ...item, lines: [] })) }))
-    : rawRows), [rawRows, bare]);
+  // The person's "clickable media cards" preference decides whether the first tap
+  // shows the card's quick actions (Planning, Hide, Lists) or opens it, as on Home.
+  const clickable = useClickableMediaCards();
+  const rows = useMemo(() => rawRows.map(row => ({ ...row, items: row.items.map(item => ({
+    ...item,
+    ...(bare ? { lines: [] } : null),
+    actions: item.actions ? { ...item.actions, clickable } : item.actions,
+  })) })), [rawRows, bare, clickable]);
   const [hidden, setHidden] = useState([]);
   const [loading, setLoading] = useState(serverMode);
   const [building, setBuilding] = useState(false);

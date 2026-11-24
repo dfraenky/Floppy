@@ -24,10 +24,11 @@ function line(parts) {
   return { join: 'dot', parts };
 }
 
+// `clickable` is set per person by the Discover surface (clickable media cards).
 function discoverActions() {
   return {
     href: '',
-    clickable: true,
+    clickable: false,
     items: [
       { kind: 'post', action: 'planning', tone: 'indigo', title: 'Add to Planning', glyph: '＋' },
       { kind: 'post', action: 'dismiss', tone: 'rose', title: 'Hide from Discover', glyph: '⦸' },

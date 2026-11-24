@@ -66,6 +66,9 @@ Status: `Partial / coexisting`
 
 - `expo/app/components/NativeStatusBar.jsx`, `expo/app/themeColor.js`, `expo/app/theme.js`, `expo/app/systemColor.ios.js`, `expo/app/systemColor.js` (iOS system semantic colors; other hosts retain the existing proof palette)
 - `expo/app/components/Screen.jsx`, `expo/app/components/Screen.ios.jsx` (shared screen presentation; iOS applies the remaining 22-point page margin after the shell's safe-area inset on each side)
+- 2026-11-23 Android insets and header backing: `frontend/ui/Shell.jsx` (`MobileNav`/`Shell` optional `insets`), `expo/app/surfaces/ShellSlot.jsx` (drawer insets, scroll-aware header backing on the detail overlay), `expo/app/screens/DetailScreen.jsx` (reports scroll through `ShellLayoutContext.onContentScroll`).
+- 2026-11-23 Android top bar gutter: `expo/app/surfaces/ShellSlot.jsx` (side padding around the shared `Shell` row).
+- 2026-11-23 native rail title detail: `frontend/ui/Rail.jsx` (`stackDetail`, off-screen measure of the one-line title group).
 
 ## SETTINGS-CARD
 
@@ -582,6 +585,14 @@ Status: `Partial / coexisting` — Expo uses the shared detail composition; the 
 - `frontend/ui/DetailComposition.jsx`
 - `frontend/ui/DetailPage.jsx` (action bar, score row, collection, notes, related grid, issue and episode cards; mounted by `expo/app/surfaces/DetailFeatures.jsx`)
 - `frontend/ui/DetailEpisode.jsx` (episode title line and picker; mounted by `expo/app/surfaces/DetailFeatures.jsx`)
+- 2026-11-23 Android detail polish: `frontend/ui/DetailPage.jsx` (`EpisodeShade`, light banner text), `frontend/ui/DetailComposition.jsx` (`AltTitle` info icon, left-aligned compact meta).
+- 2026-11-23 `absoluteFillObject` removal for React Native 0.88: `frontend/ui/SelectField.jsx`, `frontend/ui/BulkActionBar.native.jsx`, `frontend/ui/People.jsx`, `frontend/ui/PeopleToolbar.jsx`, `frontend/ui/PreferencesForm.jsx`, `frontend/ui/DetailPage.jsx`, `frontend/settings/AppearanceEditor.jsx`, `frontend/users/UsersManagement.jsx`, `expo/app/components/BarcodeScannerModal.jsx`; guard `expo/app/styleSheetCompat.test.mjs`.
+- 2026-11-23 Android accessibility roles: `role` instead of `accessibilityRole` for web-only ARIA roles in `frontend/ui/MediaTable.jsx`, `frontend/ui/SetupGuide.jsx`, `frontend/ui/controls/FeatureList.jsx`, `frontend/ui/AlphabetBar.jsx`, `frontend/ui/BulkActions.jsx`, `frontend/providers/ProviderPageView.jsx`, `frontend/pages/SettingsSidebarView.jsx`, `frontend/errors/ErrorRecovery.jsx`, `expo/app/surfaces/TableSlot.jsx`, `expo/app/surfaces/MediaCardSlot.jsx`; guard in `expo/app/styleSheetCompat.test.mjs`.
+- 2026-11-23 settings save dock: `frontend/pages/SettingsView.jsx` (`onMenuOpenChange`), `expo/app/surfaces/SettingsSaveBar.jsx` (`hidden`), `expo/app/screens/SettingsScreen.jsx`.
+- 2026-11-23 Android back gesture: `expo/App.js` (`BackHandler`).
+- 2026-11-23 game card shape on native: `expo/app/data/libraryTransportCore.js`, `expo/app/data/listTransportCore.js`, `expo/app/screens/ListDetailScreen.jsx`, `frontend/ui/CollectionBrowser.jsx`.
+- 2026-11-23 native clickable cards: `expo/app/data/useMobileGridLayout.js` (`useClickableMediaCards`), `expo/app/data/cardPreferenceCache.js`, `expo/app/data/settingsTransport.js`, `expo/app/data/libraryTransportCore.js`, `expo/app/surfaces/LibraryGrid.jsx`, `expo/app/surfaces/DiscoverSlot.jsx`, `expo/app/data/discoverTransportCore.js`.
+- 2026-11-23 native Track sheet progress cap: `expo/app/surfaces/mediaCardTransport.js` (`progressMax`).
 
 ## CHILDREN
 
@@ -1645,7 +1656,6 @@ DropdownMenu → DropdownMenuContent owns keyboard-driven layout inside the moda
 - Track dialog short-window fix (issue #2134): `TrackForm.jsx` caps the sidebar shell height to `min(92% of the window, window - 4rem)` and `TrackFormTabs.jsx` caps the 576 px General-pane floor to the space under the header, so the footer is never clipped.
 - 2026-11-23 provider header tags: `frontend/providers/ProviderPageView.jsx` clips its hidden measuring row so the `+N` tag chip cannot widen the page; fit logic stays in `frontend/providers/mediaTagFit.js`.
 - 2026-11-23 `frontend/providers/provider-page.css`: fallback media tags are one clipped line.
-- 2026-11-23 provider logos: `frontend/providers/ProviderPageView.jsx` and `frontend/ui/controls/Catalog.jsx` use `frontend/ui/ProviderLogo` (SVG-capable on native); `expo/app/data/providersTransportCore.js` makes logo paths absolute.
 - 2026-11-23 `frontend/ui/TrackDateRow.jsx`: Clear button in the open date panel; `expo/app/surfaces/MediaCardSlot.jsx`: tabs effect moved below the `status` state.
 
 

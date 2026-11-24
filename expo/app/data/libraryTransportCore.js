@@ -297,7 +297,10 @@ export function mediaCardModelFromRow(row) {
   // full size for Detail.
   const image = item.card_image || item.image || null;
   const square = ['music', 'podcast'].includes(mediaType);
-  const landscape = ['game', 'boardgame', 'video'].includes(mediaType);
+  // Same rule as the server's `card_shape` and the web grid: game and board game
+  // covers are posters. Only videos are wide; 16:9 game cards came out a third
+  // as tall as every other library and cropped the cover.
+  const landscape = mediaType === 'video';
   const shape = square ? 'square' : landscape ? 'landscape' : 'poster';
   const score = row?.score == null ? null : Number(row.score);
   const percent = total > 0 && hasProgress ? Math.min(100, Math.max(0, (progress / total) * 100)) : null;
@@ -332,18 +335,21 @@ export function mediaCardModelFromRow(row) {
 }
 
 // The web card's hover actions: tracking, lists and the item's history.
-export function cardActionsFor(title, identity) {
+// `clickable` is the person's "clickable media cards" preference: off, the
+// first tap shows these actions and the second opens the card, as on Home.
+export function cardActionsFor(title, identity, { clickable = false } = {}) {
   return {
     href: '',
     items: [
-      { kind: 'modal', modal: 'track', title: 'Edit tracking', media: identity },
-      { kind: 'modal', modal: 'lists', title: 'Add to custom lists', media: identity },
-      { kind: 'link', title: 'View your activity history', href: '/history', media: identity },
+      // The server's hover tones (media_card_model.TONES), so these match Home's buttons.
+      { kind: 'modal', modal: 'track', tone: 'indigo', title: 'Edit tracking', media: identity },
+      { kind: 'modal', modal: 'lists', tone: 'emerald', title: 'Add to custom lists', media: identity },
+      { kind: 'link', tone: 'amber', title: 'View your activity history', href: '/history', media: identity },
     ],
     ordering: null,
     modals: { track: 'track', lists: 'lists' },
     csrfToken: '',
-    clickable: true,
+    clickable: Boolean(clickable),
     title,
     media: identity,
   };

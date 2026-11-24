@@ -211,7 +211,7 @@ function resultCardModel(result) {
   return {
     title: result.title,
     image: { src: result.image, fallback: '', source: 'primary' },
-    shape: result.mediaType === 'game' ? 'square' : result.mediaType === 'video' ? 'landscape' : 'poster',
+    shape: result.mediaType === 'video' ? 'landscape' : 'poster',
     video: result.mediaType === 'video',
     href: null,
     statusChip: null,

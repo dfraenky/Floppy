@@ -80,6 +80,12 @@ export function Rail({
   const [sortFullWidth, setSortFullWidth] = useState(0);
   const collapseSort = Boolean(summaryInline) && rowWidth > 0 && groupWidth > 0 && sortFullWidth > 0
     && groupWidth + sortFullWidth + 14 > rowWidth;
+  // A long title detail ("Online Results • Internet Game Database") moves to its
+  // own muted line instead of truncating both halves; the measured width is the
+  // title group's natural one-line width.
+  const [naturalGroupWidth, setNaturalGroupWidth] = useState(0);
+  const stackDetail = Boolean(titleDetail) && rowWidth > 0 && naturalGroupWidth > 0
+    && naturalGroupWidth + (summaryInline ? 32 : 0) > rowWidth;
   const [uncontrolledCollapsed, setUncontrolledCollapsed] = useState(defaultCollapsed);
   const isCollapsed = collapsed === undefined ? uncontrolledCollapsed : collapsed;
 
@@ -166,13 +172,14 @@ export function Rail({
       : INITIAL_WINDOW;
   const onGroupLayout = event => setGroupWidth(event.nativeEvent.layout.width);
   const groupStyle = [styles.titleLink, { maxWidth: collapseSort && rowWidth > 0 ? Math.max(rowWidth - 32, 0) : '100%' }];
-  const titleContent = <>
+  const inlineTitle = <>
     <RailTitle compact={compact} color={palette.text}>{title}</RailTitle>
     {titleDetail ? <>
       <Text aria-hidden style={[styles.bullet, compact && styles.titleCompact, { color: palette.text }]}>•</Text>
       <Text role="heading" aria-level={3} numberOfLines={1} style={[styles.detail, compact && styles.titleCompact, { color: palette.text }]}>{titleDetail}</Text>
     </> : null}
   </>;
+  const titleContent = stackDetail ? <RailTitle compact={compact} color={palette.text}>{title}</RailTitle> : inlineTitle;
 
   return <View style={styles.wrapper} testID={testID}>
     {(title || summaryInline || viewAll || collapsible) ? <View style={styles.headingRow}>
@@ -196,7 +203,11 @@ export function Rail({
             <Text style={[styles.summaryInline, { color: palette.link || palette.accent }]}>{viewAll.label}</Text>
           </Pressable> : null}
         </View>
+        {stackDetail ? <Text numberOfLines={1} style={[styles.detailStacked, { color: palette.textMuted }]}>{titleDetail}</Text> : null}
         {summary ? <Text style={[styles.summary, { color: palette.textMuted }]}>{summary}</Text> : null}
+        {titleDetail ? <View aria-hidden pointerEvents="none" style={styles.measure}>
+          <View onLayout={event => setNaturalGroupWidth(event.nativeEvent.layout.width)} style={styles.titleLink}>{inlineTitle}</View>
+        </View> : null}
       </View>
       <View style={styles.controls}>
         <Pressable accessibilityRole="button" accessibilityLabel={scrollLeftLabel}
@@ -249,6 +260,9 @@ const styles = StyleSheet.create({
   titleCompact: { fontSize: 16, lineHeight: 21.6 },
   bullet: { fontSize: 18, fontWeight: '600', lineHeight: 18, flexShrink: 0 },
   detail: { fontSize: 18, fontWeight: '600', lineHeight: 18, flexShrink: 1, minWidth: 0 },
+  detailStacked: { fontSize: 14, fontWeight: '500', lineHeight: 18 },
+  // Off-screen copy of the one-line title, laid out without a width limit.
+  measure: { position: 'absolute', top: 0, left: 0, width: 10000, height: 0, overflow: 'hidden', opacity: 0, flexDirection: 'row' },
   summary: { fontSize: 13, lineHeight: 18 },
   summaryInline: { fontSize: 14, fontWeight: '500', lineHeight: 14 },
   sortButton: { flexDirection: 'row', alignItems: 'baseline', gap: 8, marginLeft: 6, flexShrink: 0 },

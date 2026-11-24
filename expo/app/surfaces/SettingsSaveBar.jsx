@@ -6,12 +6,14 @@ const SaveBarContext = createContext(null);
 
 // The settings screen owns the viewport overlay. Editors keep their existing
 // save state and callbacks; their scroll content does not own the dock geometry.
-export function SettingsSaveBarHost({ children }) {
+// `hidden` steps the dock aside while the section menu is open, so it never
+// covers the menu's last entries.
+export function SettingsSaveBarHost({ children, hidden = false }) {
   const [bar, setBar] = useState(null);
   return <SaveBarContext.Provider value={setBar}>
     <View style={styles.root}>
       {children}
-      {bar ? <View style={styles.dock}>{bar}</View> : null}
+      {bar && !hidden ? <View style={styles.dock}>{bar}</View> : null}
     </View>
   </SaveBarContext.Provider>;
 }

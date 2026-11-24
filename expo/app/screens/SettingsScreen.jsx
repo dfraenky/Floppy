@@ -78,12 +78,13 @@ function useSuperuser() {
 export function SettingsSurface({ children, navigate, active = 'providers', onNavigate }) {
   const superuser = useSuperuser();
   const { settingsPalette } = useSettingsPalettes();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const selectPage = onNavigate || (item => navigate(item.page === 'providers' ? 'Providers' : 'Settings', { page: item.page }));
-  return <SettingsSaveBarHost><Screen key={active} chrome={false} contentStyle={{ paddingTop: spacing.xl + 1, paddingBottom: 160 }}>
+  return <SettingsSaveBarHost hidden={menuOpen}><Screen key={active} chrome={false} contentStyle={{ paddingTop: spacing.xl + 1, paddingBottom: 160 }}>
     <SettingsView active={active === 'settingsRss' ? 'settingsData' : active === 'settingsApplications' ? 'settingsAccess' : active} onNavigate={selectPage}
       permissions={{ superuser }} availablePages={AVAILABLE_PAGES} palette={settingsPalette}
-      icons={{ chevron: actionIcons.chevronDown }}
+      icons={{ chevron: actionIcons.chevronDown }} onMenuOpenChange={setMenuOpen}
       renderIcon={name => (settingsNavIcons[name]
         ? <Icon spec={settingsNavIcons[name]} color={palette.textMuted} size={16} />
         : null)}>

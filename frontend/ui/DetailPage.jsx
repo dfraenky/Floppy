@@ -190,6 +190,13 @@ export function DetailCollectionBlock({ counts = [], entries, empty, palette, ac
 
 const EPISODE_ACTION_ICONS = { watch: 'eyeClosed', unwatch: 'eye', collection: 'cube', lists: 'listAdd', history: 'history' };
 
+// Darkens the lower part of the still so the light title stays readable on bright
+// artwork in every theme. React Native and the browser both draw a CSS gradient from
+// `backgroundImage`; the media card's own scrim stays MediaCard's (mediaCardReuse.test.mjs).
+function EpisodeShade() {
+  return <View pointerEvents="none" style={styles.episodeShade} />;
+}
+
 function EpisodeCard({ episode, palette, labels, renderRating, onOpen, onAction, onRate, nativeAnime = false, list = false }) {
   const [rating, setRating] = React.useState(false);
   const [expanded, setExpanded] = React.useState(false);
@@ -223,13 +230,13 @@ function EpisodeCard({ episode, palette, labels, renderRating, onOpen, onAction,
         style={StyleSheet.absoluteFill}>
         {episode.image?.src ? <Image source={{ uri: episode.image.src }} resizeMode="cover" style={StyleSheet.absoluteFill}
           accessible={false} /> : null}
-        {[40, 52, 64, 76, 88].map(top => <View key={top} pointerEvents="none"
-          style={[styles.episodeShade, { backgroundColor: palette.background, top: `${top}%` }]} />)}
       </Pressable>
+      {/* A sibling of the link, not its child: inside the absolute link the still drew over it on Android. */}
+      <EpisodeShade />
       <View style={styles.episodeBannerText}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <Pressable accessibilityRole="link" onPress={() => onOpen?.(episode)} style={{ flexShrink: 1 }}>
-            <Text numberOfLines={1} style={[styles.episodeTitle, { color: palette.text }]}>{episode.title}</Text>
+            <Text numberOfLines={1} style={[styles.episodeTitle, styles.onArtwork]}>{episode.title}</Text>
           </Pressable>
           {episode.canRate ? <Pressable accessibilityRole="button" accessibilityLabel={labels.rate}
             accessibilityState={{ expanded: rating }} onPress={() => setRating(value => !value)}
@@ -237,17 +244,16 @@ function EpisodeCard({ episode, palette, labels, renderRating, onOpen, onAction,
             <Icon spec={actionIcons.star} size={14} color={palette.warning} />
           </Pressable> : null}
         </View>
-        {episode.subtitle ? <Text style={[styles.activity, styles.episodeSubtitle, { color: palette.textSecondary }]}>{episode.subtitle}</Text> : null}
+        {episode.subtitle ? <Text style={[styles.activity, styles.episodeSubtitle, styles.onArtworkMuted]}>{episode.subtitle}</Text> : null}
       </View>
     </View> : <Pressable accessibilityRole="link" accessibilityLabel={episode.title} onPress={() => onOpen?.(episode)}
       style={[styles.episodeBanner, { backgroundColor: palette.surfaceStrong }]}>
       {episode.image?.src ? <Image source={{ uri: episode.image.src }} resizeMode="cover" style={StyleSheet.absoluteFill}
         accessible={false} /> : null}
-      {[40, 52, 64, 76, 88].map(top => <View key={top} pointerEvents="none"
-        style={[styles.episodeShade, { backgroundColor: palette.background, top: `${top}%` }]} />)}
+      <EpisodeShade />
       <View style={styles.episodeBannerText}>
-        <Text numberOfLines={2} style={[styles.episodeTitle, { color: palette.text }]}>{episode.title}</Text>
-        {episode.subtitle ? <Text style={[styles.activity, styles.episodeSubtitle, { color: palette.textSecondary }]}>{episode.subtitle}</Text> : null}
+        <Text numberOfLines={2} style={[styles.episodeTitle, styles.onArtwork]}>{episode.title}</Text>
+        {episode.subtitle ? <Text style={[styles.activity, styles.episodeSubtitle, styles.onArtworkMuted]}>{episode.subtitle}</Text> : null}
       </View>
     </Pressable>}
     {toggle && !nativeAnime ? <Pressable accessibilityRole="button" accessibilityLabel={toggle.label} disabled={toggle.disabled}
@@ -487,10 +493,16 @@ const styles = StyleSheet.create({
   historyBody: { flex: 1, minWidth: 0, gap: 2 },
   episodeCard: { borderRadius: 12, overflow: 'hidden' },
   episodeBanner: { width: '100%', aspectRatio: 16 / 9, justifyContent: 'flex-end' },
-  episodeShade: { ...StyleSheet.absoluteFillObject, opacity: 0.2 },
+  episodeShade: {
+    position: 'absolute', top: 0, right: 0, bottom: 0, left: 0,
+    backgroundImage: 'linear-gradient(to bottom, rgba(17, 24, 39, 0) 30%, rgba(17, 24, 39, 0.55) 58%, rgba(17, 24, 39, 0.88) 82%, rgba(17, 24, 39, 0.96) 100%)',
+  },
   episodeBannerText: { padding: 16, gap: 2 },
   episodeTitle: { fontSize: 22, lineHeight: 28, fontWeight: '700' },
   episodeSubtitle: { fontSize: 14 },
+  // Text on the dark scrim stays light in every theme, like the media card title.
+  onArtwork: { color: '#ffffff' },
+  onArtworkMuted: { color: '#e5e7eb' },
   episodeEye: { position: 'absolute', top: 12, right: 12, width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   episodeBody: { padding: 16, gap: 12 },
   animeEpisodeRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
@@ -502,8 +514,8 @@ const styles = StyleSheet.create({
   railControls: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   railControl: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   overlayCard: { borderRadius: 12, overflow: 'hidden', justifyContent: 'flex-end' },
-  overlayPlaceholder: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
-  overlayShade: { ...StyleSheet.absoluteFillObject },
+  overlayPlaceholder: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, alignItems: 'center', justifyContent: 'center' },
+  overlayShade: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
   overlayTitle: { fontSize: 14, fontWeight: '700', paddingHorizontal: 10, paddingBottom: 8 },
   relatedGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   relatedCell: { width: '31.5%', flexGrow: 0 },

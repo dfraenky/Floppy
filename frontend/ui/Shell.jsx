@@ -158,6 +158,7 @@ export function MobileNav({
   children,
   labels: labelOverrides,
   palette: paletteOverrides,
+  insets,
 }) {
   const palette = { ...defaultPalette, ...paletteOverrides };
   const labels = { ...defaultLabels, ...labelOverrides };
@@ -168,7 +169,12 @@ export function MobileNav({
         onPress={onClose} style={[StyleSheet.absoluteFill, { backgroundColor: palette.overlay }]} />
       {links.length || children ? <View style={[styles.drawer, {
         backgroundColor: palette.sidebar, borderRightColor: palette.border,
-      }]}>
+      }, insets ? {
+        // The modal draws under the system bars (statusBarTranslucent), so a native
+        // adapter passes its safe-area insets; the browser passes none.
+        paddingTop: 8 + (insets.top || 0),
+        paddingBottom: 24 + (insets.bottom || 0),
+      } : null]}>
         <View style={styles.drawerHeader}>
           <Text style={[styles.drawerTitle, { color: palette.text }]}>{labels.navigation}</Text>
           <Pressable accessibilityRole="button" accessibilityLabel={labels.closeMenu}
@@ -192,10 +198,10 @@ export function MobileNav({
   </Modal>;
 }
 
-export function Shell({ open = false, onToggleMenu, onCloseMenu, links, onNavigate, children, ...topBarProps }) {
+export function Shell({ open = false, onToggleMenu, onCloseMenu, links, onNavigate, children, insets, ...topBarProps }) {
   return <View style={styles.shell}>
     <TopBar {...topBarProps} menuOpen={open} onToggleMenu={onToggleMenu} />
-    <MobileNav open={open} onClose={onCloseMenu} links={links}
+    <MobileNav open={open} onClose={onCloseMenu} links={links} insets={insets}
       onNavigate={onNavigate} labels={topBarProps.labels} palette={topBarProps.palette}>
       {children}
     </MobileNav>

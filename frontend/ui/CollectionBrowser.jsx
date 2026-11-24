@@ -104,7 +104,8 @@ function filterCount(filters) {
 
 function mediaShape(mediaType) {
   if (mediaType === 'music' || mediaType === 'podcast') return 'square';
-  if (mediaType === 'video' || mediaType === 'game') return 'landscape';
+  // Game covers are posters, as on the server (`card_shape`).
+  if (mediaType === 'video') return 'landscape';
   return 'poster';
 }
 

@@ -5,6 +5,8 @@ import { Button } from './Button';
 import { DetailBackdrop } from './DetailBackdrop';
 import { DetailActivitySubtitle } from './DetailActivitySubtitle';
 import { detailHeroLayout } from './detailHeroLayout';
+import { Icon } from './Icon';
+import { actionIcons } from './actionIcons';
 
 const defaultLabels = {
   altTitle: 'Show alternative title',
@@ -45,7 +47,7 @@ function AltTitle({ text, label, palette }) {
     <Pressable accessibilityRole="button" accessibilityLabel={label}
       accessibilityState={{ expanded: open }} onPress={() => setOpen(value => !value)}
       style={styles.altButton}>
-      <Text style={[styles.altGlyph, { color: palette.textMuted }]}>i</Text>
+      <Icon spec={actionIcons.info} size={18} color={palette.textMuted} />
     </Pressable>
     {open ? <View style={[styles.altPanel, { backgroundColor: palette.surfaceStrong, borderColor: palette.border }]}>
       <Text style={[styles.altText, { color: palette.text }]}>{text}</Text>
@@ -92,8 +94,9 @@ export function DetailHeader({ model, labels, palette, showArtwork = false, onPr
         <Badge label={text.publicView} tone="outline"
           palette={{ outline: { color: colors.textSecondary, borderColor: colors.border, borderWidth: 1 } }} />
       </View> : null}
-      {compact && model?.activityText ? <DetailActivitySubtitle text={model.activityText} color={colors.textMuted} style={[styles.mobileHeroMeta, { color: colors.textMuted, textShadowRadius: 0 }]} /> : null}
-      {compact && model?.mobileMeta ? <Text style={[styles.mobileHeroMeta, { color: colors.textMuted, textShadowRadius: 0 }]}>{model.mobileMeta}</Text> : null}
+      {/* Beside the poster the lines start under the title; centring is for the full-width hero. */}
+      {compact && model?.activityText ? <DetailActivitySubtitle text={model.activityText} color={colors.textMuted} style={[styles.mobileHeroMeta, styles.compactMeta, { color: colors.textMuted }]} /> : null}
+      {compact && model?.mobileMeta ? <Text style={[styles.mobileHeroMeta, styles.compactMeta, { color: colors.textMuted }]}>{model.mobileMeta}</Text> : null}
       {!compact && facts.length ? <View style={styles.facts}>
         {facts.map((fact, index) => <View key={`${fact.label}-${index}`} style={styles.fact}>
           <Text style={[styles.factLabel, { color: colors.textMuted }]}>{fact.label}</Text>
@@ -371,7 +374,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 28, lineHeight: 34, fontWeight: '700' },
   altWrap: { flexDirection: 'row', alignItems: 'center' },
   altButton: { width: 24, height: 24, alignItems: 'center', justifyContent: 'center', borderRadius: 12 },
-  altGlyph: { fontSize: 14, fontWeight: '700', fontStyle: 'italic' },
+  compactMeta: { textAlign: 'left', textShadowRadius: 0 },
   altPanel: { marginTop: 4, maxWidth: 260, borderWidth: 1, borderRadius: 8, padding: 10 },
   altText: { fontSize: 12, lineHeight: 17 },
   publicBadge: { alignSelf: 'flex-start' },

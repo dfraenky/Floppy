@@ -17,7 +17,7 @@ import { RatingStars } from './RatingStars';
 import { SelectField } from './SelectField';
 import { TrackTabs, trackTabItems } from './TrackFormTabs';
 import { CollectionGroup, CollectionRow, CollectionSelectRow, CollectionTextRow } from './CollectionCopies';
-import { validateTrackValues } from './mediaCardForms';
+import { scoreInputToStored, validateTrackValues } from './mediaCardForms';
 import { actionIcons } from './actionIcons';
 import { TrackDateRow } from './TrackDateRow';
 import { formatTrackDuration, parseTrackDurationMinutes } from './trackDuration';
@@ -144,6 +144,15 @@ function scoreToScale(stored, scaleMax) {
 }
 function scoreFromScale(picked, scaleMax) {
   return picked === '' ? '' : String(Number((Number(picked) * 10 / scaleMax).toFixed(1)));
+}
+
+// Score typed on the viewer's scale (5 or 10) in tenths, as the web form allows (step 0.1).
+function ScoreRow({ field, value, icon, error, placeholder, palette, onChange }) {
+  const [draft, setDraft] = useState(null);
+  const shown = draft ?? scoreToScale(value, field.scaleMax);
+  return <CollectionTextRow icon={icon} label={field.label} value={shown} error={error}
+    placeholder={placeholder} palette={palette} keyboardType="decimal-pad"
+    onChangeText={next => { setDraft(next); onChange(scoreInputToStored(next, field.scaleMax)); }} />;
 }
 
 // Progress typed as a duration reads as hrs and min ("2h 15min") until it is being edited.
@@ -373,16 +382,12 @@ export function TrackForm({
       return <DurationRow key={field.name} field={field} value={value} icon={icon} error={error}
         minuteCount={minuteCount} palette={palette} onChange={next => change(field.name, next)} />;
     }
-    // Score: a picker of 1 to the viewer's scale (5 or 10); the value stays on the stored 0-10 scale.
+    // Score: typed on the viewer's scale (5 or 10) in tenths, like the web form; the value stays on
+    // the stored 0-10 scale. A whole-number picker could not hold 7.5.
     if (field.name === 'score' && type === 'number' && field.scaleMax) {
-      const picked = scoreToScale(value, field.scaleMax);
-      const options = [{ value: '', label: 'No Rating', displayLabel: labels.addRating || 'Add Rating' },
-        ...Array.from({ length: field.scaleMax }, (_, index) => ({ value: String(index + 1), label: String(index + 1) }))];
-      // A stored decimal (7.5 on the 10 scale) is not a whole step; keep it selectable until it changes.
-      if (picked && !options.some(option => option.value === picked)) options.push({ value: picked, label: picked });
-      return <CollectionSelectRow key={field.name} icon={icon} label={field.label} error={error} palette={palette}
-        filter popover renderPicker={renderSelectPicker} value={picked} options={options}
-        onChange={event => change(field.name, scoreFromScale(event.target.value, field.scaleMax))} />;
+      return <ScoreRow key={field.name} field={field} value={value} icon={icon} error={error}
+        placeholder={labels.addRating || 'Add Rating'} palette={palette}
+        onChange={next => change(field.name, next)} />;
     }
     // Without a known scale the score is a numeric input whose placeholder invites a rating.
     if (field.name === 'score' && type === 'number') {

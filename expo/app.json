@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Floppy Native Proof",
+    "name": "Floppy",
     "slug": "floppy-expo",
     "scheme": "floppy-expo",
     "version": "1.0.0",
@@ -9,7 +9,9 @@
       "bundleIdentifier": "app.floppy.nativeproof",
       "infoPlist": {
         "NSLocalNetworkUsageDescription": "Floppy searches your local network for Floppy servers you can connect to.",
-        "NSBonjourServices": ["_http._tcp."]
+        "NSBonjourServices": [
+          "_http._tcp."
+        ]
       }
     },
     "android": {
@@ -19,7 +21,12 @@
         "android.permission.CHANGE_WIFI_MULTICAST_STATE",
         "android.permission.ACCESS_LOCAL_NETWORK",
         "android.permission.VIBRATE"
-      ]
+      ],
+      "package": "app.floppy.nativeproof",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon-foreground.png",
+        "backgroundColor": "#1e1b4b"
+      }
     },
     "experiments": {
       "baseUrl": "/static/expo"
@@ -38,8 +45,15 @@
         }
       ],
       "expo-secure-store",
-      ["expo-router", { "root": "./app/routes" }],
-      "expo-status-bar"
-    ]
+      [
+        "expo-router",
+        {
+          "root": "./app/routes"
+        }
+      ],
+      "expo-status-bar",
+      "./plugins/withAndroidLocalBuild"
+    ],
+    "icon": "./assets/app-icon.png"
   }
 }

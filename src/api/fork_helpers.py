@@ -58,6 +58,10 @@ FORK_EXTRA_SOURCES = {
     # Anime resolves from all three: MAL natively, TMDB and TVDB through the
     # grouped-anime route.
     MediaTypes.ANIME.value: [Sources.TMDB.value, Sources.TVDB.value],
+    # The Audiobookshelf integration tracks audiobooks as book rows keyed by
+    # the library item id; `_audiobookshelf_book` resolves them from the
+    # local Item. Without this the app's detail page 400'd on every one.
+    MediaTypes.BOOK.value: [Sources.AUDIOBOOKSHELF.value],
 }
 
 _MODIFIABLE_FIELDS = {

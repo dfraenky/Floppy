@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 from api.fork_helpers import FORK_EXTRA_SOURCES, install_fork_media_types
 from api.helpers import VALID_SOURCES, check_source_type
-from app.models import TV, Item, MediaTypes, Sources, Status
+from app.models import TV, Book, Item, MediaTypes, Sources, Status
 
 from .base import FloppyApiTestCase
 
@@ -41,10 +41,14 @@ class ForkExtraSourcesTests(FloppyApiTestCase):
         self.assertIn(Sources.TMDB.value, VALID_SOURCES[MediaTypes.TV.value])
         self.assertIn(Sources.MANUAL.value, VALID_SOURCES[MediaTypes.TV.value])
         self.assertIn(Sources.MAL.value, VALID_SOURCES[MediaTypes.ANIME.value])
-        # Books are deliberately untouched: `_storyteller_book` and friends
-        # resolve, but nothing on this deployment tracks one, so widening that
-        # entry would close a hole no client can reach.
+        self.assertIn(Sources.OPENLIBRARY.value, VALID_SOURCES[MediaTypes.BOOK.value])
+        # Books gain only Audiobookshelf, which its integration tracks. Storyteller
+        # resolves too, but nothing writes a book row for it yet.
         self.assertNotIn(Sources.STORYTELLER.value, VALID_SOURCES[MediaTypes.BOOK.value])
+
+    def test_audiobookshelf_books_are_queryable(self):
+        """The integration writes book rows keyed by the library item id."""
+        self.assertTrue(check_source_type(MediaTypes.BOOK.value, Sources.AUDIOBOOKSHELF.value))
 
     def test_an_unroutable_source_is_still_refused(self):
         """The gate still gates — this widens the table, it does not open it."""
@@ -131,3 +135,31 @@ class ForkExtraSourcesEndpointTests(FloppyApiTestCase):
 
         self.assertEqual(response.status_code, HTTP.BAD_REQUEST)
         self.assertIn("Cannot query", response.json()["detail"])
+
+
+class AudiobookshelfBookDetailTests(FloppyApiTestCase):
+    """The app opens Audiobookshelf audiobooks through the keyed detail route."""
+
+    def test_audiobookshelf_book_detail_is_reachable(self):
+        """Resolved from the local Item, with no Open Library lookup."""
+        # The base case stubs every provider; this one is local, so run it for real.
+        self._metadata_patcher.stop()
+        item, _ = Item.objects.get_or_create(
+            media_id="li_8f2c1d",
+            source=Sources.AUDIOBOOKSHELF.value,
+            media_type=MediaTypes.BOOK.value,
+            defaults={"title": "Der Weg der Könige"},
+        )
+        Book.objects.create(user=self.user1, item=item, status=Status.IN_PROGRESS.value)
+
+        response = self.call_api(
+            "get",
+            "api_media_detail",
+            args=(MediaTypes.BOOK.value, Sources.AUDIOBOOKSHELF.value, item.media_id),
+            headers=self.auth_headers,
+        )
+
+        self.assertEqual(response.status_code, HTTP.OK)
+        self.assertEqual(response.json()["media_id"], item.media_id)
+        self.assertEqual(response.json()["source"], Sources.AUDIOBOOKSHELF.value)
+        self.assertEqual(response.json()["title"], "Der Weg der Könige")

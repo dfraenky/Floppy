@@ -17,6 +17,7 @@ import { renderNativeIcon } from '../iconRenderer';
 import SearchSlot from './SearchSlot';
 import { getShellPageType, subscribeShellPageType, ShellLayoutContext } from './shellContext';
 import NativeShell from './NativeShell';
+import { BottomNavBar } from './BottomNavBar';
 import { horizontalContentPadding } from '../safeAreaSpacing.mjs';
 import { statusBarInset } from '../status-bar-inset';
 import { palette, radius } from '../theme';
@@ -239,7 +240,11 @@ export default function ShellSlot({
   const model = serverModel ? markActive(withGlyphs(serverModel), activeHref) : null;
   const routeMediaType = activeHref.match(/^\/medialist\/([^/?#]+)/)?.[1];
   // The type the user last picked wins on every screen (as on web); the page's own type is only the fallback.
-  const searchType = lastSubmittedType || serverModel?.lastSearchType || pageType || routeMediaType || 'all';
+  // Android phones: the bar searches the page's own type, else everything, so Home and Discover
+  // read "Search your whole library…" instead of the last type searched elsewhere.
+  const searchType = Platform.OS === 'android'
+    ? (pageType || routeMediaType || 'all')
+    : (lastSubmittedType || serverModel?.lastSearchType || pageType || routeMediaType || 'all');
   const pins = {
     pinned,
     pinnedLists: listPins,
@@ -330,13 +335,15 @@ export default function ShellSlot({
     </NativeShell>;
   }
 
+  const phoneNav = Platform.OS === 'android';
   const shellRow = <Shell
     open={open}
     onToggleMenu={() => setOpen(value => !value)}
     onCloseMenu={() => setOpen(false)}
     links={[]}
     variant="app"
-    showMenu
+    // Android opens the drawer from the navigation bar's "More"; the top row is search only.
+    showMenu={!phoneNav}
     showSearch
     showThemeButton={false}
     search={search}
@@ -350,8 +357,14 @@ export default function ShellSlot({
   // none, so the native bar adds it here. The menu button's 36px box centres a
   // 22px glyph, so the left side is 7px short to line the glyph up with the
   // page's 16px gutter.
-  const shell = <View style={{ paddingLeft: 9 + (insets.left || 0), paddingRight: 16 + (insets.right || 0) }}>{shellRow}</View>;
-  if (!overlaySearch) return <>{shell}{content}</>;
+  const shell = <View style={{ paddingLeft: (phoneNav ? 16 : 9) + (insets.left || 0), paddingRight: 16 + (insets.right || 0) }}>{shellRow}</View>;
+  // Stack pages (details, history, lists…) have no tab href; they keep the full height.
+  const bottomNav = phoneNav && activeHref ? <BottomNavBar activeHref={activeHref} menuOpen={open}
+    palette={{ ...shellPalette, indicator: 'rgba(99, 102, 241, 0.32)', accentText: '#ffffff' }}
+    bottomInset={insets.bottom || 0}
+    onOpenMenu={() => setOpen(true)}
+    onNavigate={key => { setOpen(false); onNavigate?.(key); }} /> : null;
+  if (!overlaySearch) return <>{shell}<View style={{ flex: 1, minHeight: 0 }}>{content}</View>{bottomNav}</>;
   // Android also lets detail artwork continue under search; other pages keep the reviewed shell.
   return <View style={{ flex: 1 }} onLayout={event => setDetailViewport(event.nativeEvent.layout)}>
     <ShellLayoutContext.Provider value={{ ...detailViewport, insets, headerHeight: detailHeaderHeight, onContentScroll }}>

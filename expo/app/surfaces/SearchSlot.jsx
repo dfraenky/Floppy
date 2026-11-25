@@ -82,6 +82,8 @@ const searchPalette = {
   radius: radius.sm,
   focusStyle: Platform.OS === 'ios' ? { outlineColor: 'transparent' } : {},
   ...(Platform.OS === 'ios' ? { inputHeight: 44, searchTouchWidth: 44 } : {}),
+  // Material 3 search bar on Android: a 48 dp pill.
+  ...(Platform.OS === 'android' ? { inputHeight: 48, searchTouchWidth: 48, radius: 24 } : {}),
 };
 
 export default function SearchSlot({

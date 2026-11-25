@@ -1,3 +1,5 @@
+import { actionIcons } from './actionIcons';
+import { Icon } from './Icon';
 import React, { useContext, useRef, useState } from 'react';
 import { Animated, Pressable, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { Modal } from './Modal';
@@ -70,7 +72,7 @@ export function DropdownItem({ label, icon, detail, chevron = false, checked = f
     <Text numberOfLines={numberOfLines} style={[styles.itemText, { color }]}>{label}</Text>
     {detail ? <Text style={[styles.itemDetail, { color: palette.textMuted }]}>{detail}</Text> : null}
     {checked ? <Text accessible={false} style={[styles.itemDetail, { color: palette.accent || palette.textSecondary }]}>✓</Text> : null}
-    {chevron ? <Text accessible={false} style={[styles.chevron, { color: palette.textMuted }]}>›</Text> : null}
+    {chevron ? <Icon spec={actionIcons.chevronRight} size={16} color={palette.textMuted} /> : null}
   </Pressable>;
 }
 

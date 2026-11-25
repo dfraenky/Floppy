@@ -1,5 +1,6 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { Icon } from '../../../frontend/ui/Icon';
+import { actionIcons } from '../../../frontend/ui/actionIcons';
 import { SelectField } from '../../../frontend/ui/SelectField';
 
 // Android uses the shared accessible dropdown (iOS supplies a system menu in
@@ -13,5 +14,5 @@ export function renderSelectRowPicker({ label = 'Calendar Type', value, options,
     onChange={event => onChange(event.target.value)}
     triggerStyle={{ borderWidth: 0, backgroundColor: 'transparent', paddingHorizontal: 0, paddingVertical: 0 }}
     triggerTextStyle={{ color: palette.textSecondary, fontSize: 16 }}
-    indicator={<Text style={{ color: palette.textMuted, fontSize: 13, lineHeight: 8, textAlign: 'center' }}>{'⌃\n⌄'}</Text>} />;
+    indicator={<Icon spec={actionIcons.chevronsUpDown} size={16} color={palette.textMuted} />} />;
 }

@@ -100,6 +100,7 @@ import {
   createLatestGate,
   storedScore,
 } from './detailActions.mjs';
+import { confirmSaved } from '../components/saveFeedback';
 
 // The detail page's own controls on top of the server page payload: the track
 // dialog and check-in, tags, notes, lists, activity history, the progress card,
@@ -601,6 +602,7 @@ export function useDetailFeatures({ model, ready, dataReady, version, refresh, o
     setTrack(current => ({ ...current, busy: true, serverError: '' }));
     try {
       await saveTrack(track.identity, track.model, values, track.tracked);
+      confirmSaved();
       // The saved status shows at once; the rest of the page reloads behind it.
       if (sameIdentity(track.identity, identity)) setTracking(current => applyTrackingStatus(current, values?.status));
       setTrack(EMPTY_TRACK);

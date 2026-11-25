@@ -87,7 +87,9 @@ function Artwork({ model, palette, selection, onPress, onLongPress }) {
   </View>;
 
   if (!onPress) return frame;
-  return <Pressable accessibilityRole="button" accessibilityLabel={model.title} onPress={onPress} onLongPress={onLongPress}>
+  // A short press-in (scale 0.97) confirms the tap before the actions or the page appear.
+  return <Pressable accessibilityRole="button" accessibilityLabel={model.title} onPress={onPress} onLongPress={onLongPress}
+    style={({ pressed }) => pressed ? styles.cardPressed : null}>
     {frame}
   </Pressable>;
 }
@@ -278,7 +280,7 @@ function Rating({ model, palette, labels, renderRating, onRate, readOnly }) {
 function AltTitle({ label, open, onPress, palette }) {
   return <Pressable accessibilityRole="button" accessibilityLabel={label}
     accessibilityState={{ expanded: open }} onPress={onPress} style={styles.altButton}>
-    <Text style={[styles.altIcon, { color: palette.textMuted }]}>ⓘ</Text>
+    <Icon spec={actionIcons.info} size={15} color={palette.textMuted} />
   </Pressable>;
 }
 
@@ -502,6 +504,7 @@ export const MediaCard = React.memo(function MediaCard(props) {
 });
 
 const styles = StyleSheet.create({
+  cardPressed: { transform: [{ scale: 0.97 }], opacity: 0.94 },
   card: { position: 'relative', borderWidth: 1, borderRadius: 8, overflow: 'hidden' },
   artworkWrap: { position: 'relative' },
   artworkStage: { position: 'relative' },

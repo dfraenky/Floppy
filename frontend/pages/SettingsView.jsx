@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { Icon } from '../ui/Icon';
+import { actionIcons } from '../ui/actionIcons';
 import { SettingsNavLink } from './SettingsNavLink';
 
 // The Django settings navigation is the source for this model: the same groups,
@@ -100,7 +101,7 @@ export function SettingsNav({
       </View>
       {icons.chevron ? <View style={[styles.menuChevronIcon, open && styles.menuChevronOpen]}>
         <Icon spec={icons.chevron} />
-      </View> : <Text style={[styles.menuChevron, { color: palette.textMuted || '#a1a1aa' }]}>{open ? '⌃' : '⌄'}</Text>}
+      </View> : <Icon spec={open ? actionIcons.chevronUp : actionIcons.chevronDown} size={18} color={palette.textMuted || '#a1a1aa'} />}
     </Pressable> : null}
     {!collapsible || open ? <View style={styles.navBody}>
       {navigation.map(group => {

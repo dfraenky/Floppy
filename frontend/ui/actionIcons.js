@@ -4,6 +4,10 @@ const root = { fill: 'none', stroke: 'currentColor', 'stroke-width': '2', 'strok
 const icon = children => ({ viewBox: '0 0 24 24', root, children });
 
 export const actionIcons = {
+  chevronUp: icon([{ tag: 'path', attrs: { d: 'm18 15-6-6-6 6' }, children: [] }]),
+  chevronsUpDown: icon([{ tag: 'path', attrs: { d: 'm7 15 5 5 5-5' }, children: [] }, { tag: 'path', attrs: { d: 'm7 9 5-5 5 5' }, children: [] }]),
+  arrowUp: icon([{ tag: 'path', attrs: { d: 'm5 12 7-7 7 7' }, children: [] }, { tag: 'path', attrs: { d: 'M12 19V5' }, children: [] }]),
+  arrowDown: icon([{ tag: 'path', attrs: { d: 'M12 5v14' }, children: [] }, { tag: 'path', attrs: { d: 'm19 12-7 7-7-7' }, children: [] }]),
   disc: icon([{ tag: 'circle', attrs: { cx: '12', cy: '12', r: '10' }, children: [] }, { tag: 'circle', attrs: { cx: '12', cy: '12', r: '2' }, children: [] }]),
   monitor: icon([{ tag: 'rect', attrs: { width: '20', height: '14', x: '2', y: '3', rx: '2' }, children: [] }, { tag: 'path', attrs: { d: 'M8 21h8M12 17v4' }, children: [] }]),
   sun: icon([{ tag: 'circle', attrs: { cx: '12', cy: '12', r: '4' }, children: [] }, { tag: 'path', attrs: { d: 'M12 2v2M12 20v2m-6.93-15.07 1.41 1.41m11.02 11.02 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.02-11.02 1.41-1.41' }, children: [] }]),

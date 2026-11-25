@@ -20,6 +20,20 @@ const DEFAULT_PALETTE = {
   codeBackground: '#1f2328',
 };
 
+// Lucide shapes for the grouped toolbar, so eight tools fit on one row as icons instead of letters.
+const toolPath = ds => ({ viewBox: '0 0 24 24', root: { fill: 'none', stroke: 'currentColor', 'stroke-width': '2',
+  'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, children: ds.map(d => ({ tag: 'path', attrs: { d }, children: [] })) });
+const TOOL_ICONS = {
+  heading: toolPath(['M6 12h12', 'M6 20V4', 'M18 20V4']),
+  bold: toolPath(['M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8']),
+  italic: toolPath(['M19 4h-9', 'M14 20H5', 'M15 4 9 20']),
+  code: toolPath(['m16 18 6-6-6-6', 'm8 6-6 6 6 6']),
+  link: toolPath(['M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71', 'M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71']),
+  quote: toolPath(['M17 6H3', 'M21 12H8', 'M21 18H8', 'M3 12v6']),
+  ul: toolPath(['M3 12h.01', 'M3 18h.01', 'M3 6h.01', 'M8 12h13', 'M8 18h13', 'M8 6h13']),
+  ol: toolPath(['M10 12h11', 'M10 18h11', 'M10 6h11', 'M4 10h2', 'M4 6h1v4', 'M6 18H4c0-1 2-2 2-3s-1-1.5-2-1']),
+};
+
 const DEFAULT_LABELS = {
   write: 'Write',
   preview: 'Preview',
@@ -191,14 +205,13 @@ export function MarkdownNotes({
               </Pressable>;
             })}
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.groupedToolsScroll}
-            contentContainerStyle={styles.groupedTools}>
-            {TOOLBAR.map(item => <Pressable key={item.action} accessibilityRole="button"
-              accessibilityLabel={labels[item.label]} disabled={disabled} onPress={() => runAction(item.action)}
-              style={({ pressed }) => [styles.groupedTool, pressed && { backgroundColor: fill }]}>
-              <Text style={[styles.groupedToolText, { color: disabled ? palette.textMuted : palette.textSecondary }]}>{item.glyph}</Text>
-            </Pressable>)}
-          </ScrollView>
+        </View>
+        <View key="tools" style={styles.groupedTools}>
+          {TOOLBAR.map(item => <Pressable key={item.action} accessibilityRole="button"
+            accessibilityLabel={labels[item.label]} disabled={disabled} onPress={() => runAction(item.action)} hitSlop={4}
+            style={({ pressed }) => [styles.groupedTool, pressed && { backgroundColor: fill }]}>
+            <Icon spec={TOOL_ICONS[item.action]} size={18} color={disabled ? palette.textMuted : palette.textSecondary} />
+          </Pressable>)}
         </View>
         <View key="body">{input_}</View>
       </CollectionGroup>
@@ -266,8 +279,9 @@ const styles = StyleSheet.create({
   segment: { borderRadius: 7, paddingHorizontal: 14, paddingVertical: 5 },
   segmentText: { fontSize: 14, fontWeight: '600' },
   groupedToolsScroll: { flex: 1, minWidth: 0 },
-  groupedTools: { flexGrow: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 2 },
-  groupedTool: { minWidth: 32, alignItems: 'center', borderRadius: 7, paddingHorizontal: 6, paddingVertical: 6 },
+  // Tools get their own row under Write / Preview: all eight fit on a phone without scrolling.
+  groupedTools: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 8 },
+  groupedTool: { minWidth: 36, minHeight: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
   groupedToolText: { fontSize: 14, fontWeight: '600' },
   groupedInput: { paddingVertical: 12, fontSize: 17, lineHeight: 22 },
   groupedPreview: { paddingVertical: 12 },

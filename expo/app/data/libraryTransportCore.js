@@ -56,8 +56,8 @@ function runtimeLabel(item) {
   if (!Number.isFinite(minutes) || minutes <= 0) return '';
   const hours = Math.floor(minutes / 60);
   const rest = minutes % 60;
-  if (!hours) return `${rest}m`;
-  return rest ? `${hours}h ${rest}m` : `${hours}h`;
+  if (!hours) return `${rest}min`;
+  return rest ? `${hours}h ${rest}min` : `${hours}h`;
 }
 
 function progressText(row, unit) {
@@ -71,7 +71,7 @@ function progressText(row, unit) {
     if (!Number.isFinite(minutes)) return { text: String(progress), maxText: '' };
     const hours = Math.floor(minutes / 60);
     const rest = Math.round(minutes % 60);
-    const label = hours ? `${hours}h${rest ? ` ${rest}m` : ''}` : `${rest}m`;
+    const label = hours ? `${hours}h${rest ? ` ${rest}min` : ''}` : `${rest}min`;
     return { text: label, maxText: ' played' };
   }
   if (unit === 'pages' || unit === 'chapters' || unit === 'issues') {

@@ -41,6 +41,7 @@ import {
   setTags,
   toggleList,
 } from './mediaCardTransport';
+import { confirmSaved } from '../components/saveFeedback';
 
 export const surface = {
   id: 'MEDIA-CARD',
@@ -289,6 +290,7 @@ function TrackAction({ action, onClose, railTabs = false, activeTab, onTabChange
     setServerError('');
     try {
       await saveTrack(identity, model, nextValues, tracked);
+      confirmSaved();
       const refreshed = await loadTrack(identity, { trackTime: true });
       setTracked(Boolean(refreshed.tracked));
       setTabs(refreshed.tabs || []);

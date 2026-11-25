@@ -1,5 +1,7 @@
 import React from 'react';
-import { Pressable, Text } from 'react-native';
+import { Pressable } from 'react-native';
+import { Icon } from '../../../frontend/ui/Icon';
+import { actionIcons } from '../../../frontend/ui/actionIcons';
 
 // Native Liquid Glass is iOS-only; on Android and web a tonal circle tinted from the title
 // colour, so it reads on light and dark sheets alike (Material 3 filled-tonal icon button).
@@ -7,7 +9,7 @@ export function SheetCloseButton({ onPress, color }) {
   return <Pressable accessibilityRole="button" accessibilityLabel="Close sheet" onPress={onPress} hitSlop={8}
     style={({ pressed }) => ({ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center',
       backgroundColor: tint(color, pressed ? 0.22 : 0.12) })}>
-    <Text style={{ color, fontSize: 24, lineHeight: 28, marginTop: -2 }}>×</Text>
+    <Icon spec={actionIcons.close} size={20} color={color} />
   </Pressable>;
 }
 

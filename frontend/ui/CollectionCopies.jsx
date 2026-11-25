@@ -13,6 +13,9 @@ import { SelectField } from './SelectField';
 import { systemSeparatorColor } from './separatorColor';
 import { FormError, FormHeader, FormSelect } from './MediaCardFormControls';
 
+// Android's touch ripple on grouped rows; other platforms ignore the prop.
+const ROW_RIPPLE = { color: 'rgba(127, 127, 127, 0.18)' };
+
 const DEFAULT_PALETTE = {
   text: '#fafafa',
   textSecondary: '#d4d4d8',
@@ -94,7 +97,7 @@ export function CollectionBreakdownRow({ label, count, value, swatch, onPress, p
     {count > 0 || value ? <Text style={[styles.contextMeta, { color: palette.textMuted }]}>{value || count}</Text> : null}
     {onPress ? <Icon spec={actionIcons.chevronRight} size={14} color={palette.textMuted} /> : null}
   </View>;
-  return onPress ? <Pressable accessibilityRole="link" accessibilityLabel={label} onPress={onPress}>{row}</Pressable> : row;
+  return onPress ? <Pressable accessibilityRole="link" accessibilityLabel={label} onPress={onPress} android_ripple={ROW_RIPPLE}>{row}</Pressable> : row;
 }
 
 export function CollectionSectionHeading({ title, palette: suppliedPalette, variant = 'native' }) {
@@ -183,7 +186,7 @@ export function CollectionRow({ icon, image, tone, after, label, value, onPress,
   </>;
   const rowStyle = [styles.groupRow, multiline && styles.groupRowMultiline];
   if (!onPress) return <View style={rowStyle}>{content}</View>;
-  return <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel || label} onPress={onPress}
+  return <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel || label} onPress={onPress} android_ripple={ROW_RIPPLE}
     style={({ pressed }) => [rowStyle, pressed && { opacity: 0.72 }]}>{content}</Pressable>;
 }
 

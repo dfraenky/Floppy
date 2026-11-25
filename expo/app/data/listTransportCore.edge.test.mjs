@@ -77,8 +77,8 @@ test('listItemsFromPayload ranks by offset unless the entry carries a rank', () 
 
 test('progressLabel reads every unit the web prints', () => {
   const label = entry => listItemsFromPayload({ items: [entry] })[0].progressLabel;
-  assert.equal(label({ progress: 45, progress_unit: 'minutes' }), '45m played');
-  assert.equal(label({ progress: 130, progress_unit: 'minutes' }), '2h 10m played');
+  assert.equal(label({ progress: 45, progress_unit: 'minutes' }), '45min played');
+  assert.equal(label({ progress: 130, progress_unit: 'minutes' }), '2h 10min played');
   assert.equal(label({ progress: 'abc', progress_unit: 'minutes' }), 'abc');
   assert.equal(label({ progress: 1, progress_unit: 'plays' }), '1 play');
   assert.equal(label({ progress: 3, progress_unit: 'plays' }), '3 plays');

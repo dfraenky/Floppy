@@ -1,3 +1,5 @@
+import { actionIcons } from './actionIcons';
+import { Icon } from './Icon';
 import { RailTitle } from './RailTitle';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
@@ -194,7 +196,7 @@ export function Rail({
               style={({ pressed }) => [styles.sortButton, pressed && styles.pressed]}
               onLayout={event => { if (!collapseSort && !sorting) setSortFullWidth(event.nativeEvent.layout.width); }}>
               {collapseSort ? null : <Text numberOfLines={1} style={[styles.summaryInline, { color: palette.textMuted }]}>{summaryInline}</Text>}
-              <Text aria-hidden style={[styles.sortIcon, { color: palette.textMuted }]}>{direction === 'asc' ? '▲' : '▼'}</Text>
+              <Icon spec={direction === 'asc' ? actionIcons.arrowUp : actionIcons.arrowDown} size={16} color={palette.textMuted} />
               {sorting ? <Spinner size={14} color={palette.loading} /> : null}
             </Pressable>
             : <Text numberOfLines={1} style={[styles.summaryInline, { color: palette.textMuted }]}>{summaryInline}</Text>) : null}
@@ -213,17 +215,17 @@ export function Rail({
         <Pressable accessibilityRole="button" accessibilityLabel={scrollLeftLabel}
           accessibilityState={{ disabled: !canScrollPrev }} disabled={!canScrollPrev}
           onPress={() => scrollByPage(-1)} style={[styles.iconButton, !canScrollPrev && styles.hiddenControl]}>
-          <Text aria-hidden style={[styles.arrow, { color: palette.arrow }]}>‹</Text>
+          <Icon spec={actionIcons.chevronLeft} size={20} color={palette.arrow} />
         </Pressable>
         <Pressable accessibilityRole="button" accessibilityLabel={scrollRightLabel}
           accessibilityState={{ disabled: !canScrollNext }} disabled={!canScrollNext}
           onPress={() => scrollByPage(1)} style={[styles.iconButton, !canScrollNext && styles.hiddenControl]}>
-          <Text aria-hidden style={[styles.arrow, { color: palette.arrow }]}>›</Text>
+          <Icon spec={actionIcons.chevronRight} size={20} color={palette.arrow} />
         </Pressable>
         {collapsible ? <Pressable accessibilityRole="button" accessibilityLabel={collapseLabel}
           accessibilityState={{ expanded: !isCollapsed }} onPress={toggleCollapsed}
           style={[styles.iconButton, styles.toggleButton]}>
-          <Text aria-hidden style={[styles.chevron, { color: palette.textMuted, transform: [{ rotate: isCollapsed ? '0deg' : '180deg' }] }]}>⌄</Text>
+          <Icon spec={isCollapsed ? actionIcons.chevronDown : actionIcons.chevronUp} size={18} color={palette.textMuted} />
         </Pressable> : null}
       </View>
     </View> : null}

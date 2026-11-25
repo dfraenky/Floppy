@@ -1,3 +1,5 @@
+import { actionIcons } from './actionIcons';
+import { Icon } from './Icon';
 import { Modal, ModalCloseButton } from './Modal';
 import { DropdownBackItem, DropdownField, DropdownHeading, DropdownItem, DropdownMenu, DropdownSeparator } from './DropdownMenu';
 import React, { useMemo, useRef, useState } from 'react';
@@ -502,7 +504,7 @@ export function FilterBar({
           disabled={isDisabled}
           onPress={() => emit({ type: 'set', key: 'direction', value: filters.direction === 'asc' ? 'desc' : 'asc' })}
           style={({ pressed }) => [styles.sortArrow, pressed && styles.pressed]}>
-          <View style={filters.direction === 'asc' ? styles.caretUp : styles.caret} />
+          <Icon spec={filters.direction === 'asc' ? actionIcons.arrowUp : actionIcons.arrowDown} size={18} color={styles.caret.borderTopColor} />
         </Pressable>
       </View> : <Trigger
         label={`${copy.sort}: ${optionLabel(options.sorts, filters.sort)} ${filters.direction === 'asc' ? copy.ascending : copy.descending}`}
@@ -671,7 +673,7 @@ export function FilterBar({
               accessibilityLabel={copy.close}
               onPress={closeSheet}
               style={({ pressed }) => [styles.close, pressed && styles.pressed]}>
-              <Text style={styles.closeText}>×</Text>
+              <Icon spec={actionIcons.close} size={20} color={styles.closeText.color} />
             </ModalCloseButton>
           </View>
           <ScrollView style={styles.sheetBody} contentContainerStyle={styles.sheetContent} keyboardShouldPersistTaps="handled">
@@ -766,7 +768,7 @@ function Trigger({ label, value, expanded, disabled, onPress, styles, plain = fa
     onPress={press}
     style={({ pressed }) => [styles.trigger, plain && styles.triggerPlain, expanded && !plain && styles.triggerOpen, pressed && styles.pressed]}>
     <Text numberOfLines={1} style={[styles.triggerText, plain && styles.triggerTextPlain]}>{value}</Text>
-    {plain ? (caret ? <View style={styles.caret} /> : null) : <Text style={styles.chevron}>▾</Text>}
+    {plain ? (caret ? <Icon spec={actionIcons.chevronDown} size={16} color={styles.caret.borderTopColor} /> : null) : <Icon spec={actionIcons.chevronDown} size={14} color={styles.chevron.color} />}
   </Pressable>;
 }
 
@@ -814,7 +816,7 @@ function FiltersSheet({ filters, options, copy, styles, sections, onToggleType, 
           style={({ pressed }) => [styles.option, pressed && styles.pressed]}>
           <Text style={styles.optionText}>{section.label}</Text>
           <Text style={styles.optionValue}>{summary || section.idleLabel || copy.any}</Text>
-          <Text style={styles.chevron}>›</Text>
+          <Icon spec={actionIcons.chevronRight} size={16} color={styles.chevron.color} />
         </Pressable>;
       })}
     </View> : null}
@@ -828,7 +830,7 @@ function FiltersSheet({ filters, options, copy, styles, sections, onToggleType, 
         style={({ pressed }) => [styles.option, pressed && styles.pressed]}>
         <Text style={styles.optionText}>{range.label}</Text>
         <Text style={styles.optionValue}>{rangeSummary(range, (filters.ranges || {})[range.key])}</Text>
-        <Text style={styles.chevron}>›</Text>
+        <Icon spec={actionIcons.chevronRight} size={16} color={styles.chevron.color} />
       </Pressable>)}
     </Section> : null}
 

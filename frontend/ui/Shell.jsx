@@ -1,3 +1,5 @@
+import { actionIcons } from './actionIcons';
+import { Icon } from './Icon';
 import { Modal } from './Modal';
 import React from 'react';
 import {
@@ -182,7 +184,7 @@ export function MobileNav({
               backgroundColor: pressed ? palette.surfaceMuted : 'transparent',
               borderRadius: palette.radius,
             }, focused && palette.focusStyle]}>
-            <Text aria-hidden style={[styles.closeGlyph, { color: palette.textMuted }]}>×</Text>
+            <Icon spec={actionIcons.close} size={22} color={palette.textMuted} />
           </Pressable>
         </View>
         <View style={styles.drawerBody}>

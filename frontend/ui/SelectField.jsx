@@ -126,7 +126,7 @@ export function SelectField({
       {indicator || (filter ? <View style={styles.filterChevron}><Icon spec={CHEVRON_DOWN} color={colors.textMuted} size={16} /></View>
         : iconChevron
           ? <View style={styles.chevron}><Icon spec={actionIcons.chevronDown} color={colors.textMuted} size={16} style={{ color: colors.textMuted, fontSize: 14 }}>{'▾'}</Icon></View>
-          : <Text style={[styles.chevron, { color: colors.textMuted }]}>▾</Text>)}
+          : <View style={styles.chevron}><Icon spec={actionIcons.chevronDown} color={colors.textMuted} size={16} /></View>)}
     </Pressable>
     {error ? <Text accessibilityRole="alert" style={[styles.error, { color: colors.danger }]}>{error}</Text> : null}
     {popover ? <DropdownMenu open={open} anchor={anchor} palette={colors} closeLabel={defaultLabels.close}

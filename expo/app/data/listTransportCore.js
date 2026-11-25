@@ -120,7 +120,7 @@ function progressLabel(entry) {
     if (!Number.isFinite(minutes)) return String(progress);
     const hours = Math.floor(minutes / 60);
     const rest = Math.round(minutes % 60);
-    return `${hours ? `${hours}h${rest ? ` ${rest}m` : ''}` : `${rest}m`} played`;
+    return `${hours ? `${hours}h${rest ? ` ${rest}min` : ''}` : `${rest}min`} played`;
   }
   if (unit === 'plays') return `${progress} ${Number(progress) === 1 ? 'play' : 'plays'}`;
   if (unit === 'pages') return `${progress} pages`;

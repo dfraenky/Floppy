@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Linking, Pressable, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
+import { Icon } from '../../../frontend/ui/Icon';
+import { libraryTypesFrom, useNavigationModel } from '../data/navigationModel';
 import { AlphabetBar } from '../../../frontend/ui/AlphabetBar.native';
 import { getActiveAuthSession } from '../data/authSession';
 import { LibraryPageView } from '../../../frontend/pages/LibraryPageView';
@@ -165,7 +167,37 @@ export function filtersFromQuery(params, current) {
 // media type never carry into the next one the drawer opens.
 export default function LibraryScreen(props) {
   const { mediaType, query, tag } = props.params || {};
-  return <LibraryPage key={`${mediaType || ''}|${query || ''}|${tag || ''}`} {...props} />;
+  const page = <LibraryPage key={`${mediaType || ''}|${query || ''}|${tag || ''}`} {...props} />;
+  // The Library tab switches media types in place from a chip row; a filtered library opened
+  // from a Home row or a tag keeps its single type.
+  if (query || tag || !props.onSwitchLibraryType) return page;
+  return <View style={styles.tabRoot}>
+    <LibraryTypeChips current={mediaType} onSelect={props.onSwitchLibraryType} />
+    {page}
+  </View>;
+}
+
+function LibraryTypeChips({ current, onSelect }) {
+  const { model } = useNavigationModel();
+  const types = libraryTypesFrom(model);
+  const scroller = useRef(null);
+  if (types.length < 2) return null;
+  return <ScrollView ref={scroller} horizontal showsHorizontalScrollIndicator={false}
+    style={styles.typeChipsScroll} contentContainerStyle={styles.typeChips}
+    accessibilityRole="tablist" accessibilityLabel="Media type">
+    {types.map(entry => {
+      const selected = entry.type === current;
+      return <Pressable key={entry.type} accessibilityRole="tab" accessibilityState={{ selected }}
+        accessibilityLabel={entry.label} onPress={() => { if (!selected) onSelect(entry.type); }}
+        android_ripple={{ color: 'rgba(127, 127, 127, 0.18)', borderless: false }}
+        style={[styles.typeChip, selected
+          ? { backgroundColor: palette.accentStrong || palette.accent, borderColor: palette.accentStrong || palette.accent }
+          : { backgroundColor: palette.surface, borderColor: palette.border }]}>
+        {entry.icon ? <Icon spec={entry.icon} size={16} color={selected ? '#ffffff' : palette.textSecondary} /> : null}
+        <Text style={[styles.typeChipText, { color: selected ? '#ffffff' : palette.textSecondary }]}>{entry.label}</Text>
+      </Pressable>;
+    })}
+  </ScrollView>;
 }
 
 function LibraryPage({ params, navigate }) {
@@ -704,6 +736,12 @@ function LibraryPage({ params, navigate }) {
 }
 
 const styles = StyleSheet.create({
+  tabRoot: { flex: 1, minHeight: 0 },
+  typeChipsScroll: { flexGrow: 0, flexShrink: 0 },
+  typeChips: { gap: 8, paddingHorizontal: 16, paddingTop: 4, paddingBottom: 8 },
+  typeChip: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 36, paddingHorizontal: 14,
+    borderRadius: 18, borderWidth: 1, overflow: 'hidden' },
+  typeChipText: { fontSize: 14, fontWeight: '600' },
   rail: { position: 'absolute', right: spacing.xs, top: 160, bottom: spacing.lg, width: 32, zIndex: 20 },
   searchGroup: { width: '100%' },
   searchInput: { color: palette.text, backgroundColor: palette.surface, borderColor: palette.border,

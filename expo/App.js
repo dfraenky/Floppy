@@ -14,6 +14,8 @@ import DiscoverScreen from './app/screens/DiscoverScreen';
 import HistoryScreen from './app/screens/HistoryScreen';
 import HomeScreen from './app/screens/HomeScreen';
 import LibraryScreen from './app/screens/LibraryScreen';
+import MoreScreen from './app/screens/MoreScreen';
+import { loadLastLibraryType, saveLastLibraryType } from './app/data/lastLibraryType';
 import ListDetailScreen from './app/screens/ListDetailScreen';
 import ListsScreen from './app/screens/ListsScreen';
 import SearchScreen from './app/screens/SearchScreen';
@@ -34,6 +36,7 @@ const TAB_SCREENS = {
   library: LibraryScreen,
   calendar: CalendarScreen,
   settings: SettingsScreen,
+  more: MoreScreen,
 };
 
 const STACK_SCREENS = {
@@ -54,6 +57,13 @@ export default function App() {
   const [restoring, setRestoring] = useState(true);
   const [tab, setTab] = useState('home');
   const [libraryType, setLibraryType] = useState('movie');
+  // The Library tab opens the media type used last, across launches.
+  useEffect(() => {
+    loadLastLibraryType().then(value => { if (value) setLibraryType(value); });
+  }, []);
+  useEffect(() => { saveLastLibraryType(libraryType); }, [libraryType]);
+  // Switching types from the Library chips stays on one tab: no back-history entry per type.
+  const switchLibraryType = mediaType => { setStack([]); setLibraryType(mediaType); };
   const [stack, setStack] = useState([]);
   const [tabHistory, setTabHistory] = useState([]);
   const navigate = (screen, params) => {
@@ -189,6 +199,7 @@ export default function App() {
       : tab === 'discover' ? '/discover'
         : tab === 'calendar' ? '/calendar'
           : tab === 'settings' ? '/settings/account'
+            : tab === 'more' ? '/more'
             : tab === 'library' ? `/medialist/${libraryType}` : '';
   const ActiveScreen = active ? STACK_SCREENS[active.screen] : TAB_SCREENS[tab];
   const tabParams = tab === 'library' ? { mediaType: libraryType } : undefined;
@@ -201,7 +212,8 @@ export default function App() {
       <View style={styles.body}>
         {active
           ? <ActiveScreen params={active.params} navigate={navigate} onBack={back} />
-          : <ActiveScreen navigate={navigate} params={tabParams} onOpenTab={openTab} />}
+          : <ActiveScreen navigate={navigate} params={tabParams} onOpenTab={openTab} onOpenHref={openHref}
+            onSwitchLibraryType={tab === 'library' ? switchLibraryType : undefined} />}
       </View>
     </ShellSlot>
   </NativeRoot>;

@@ -359,10 +359,9 @@ export default function ShellSlot({
   // page's 16px gutter.
   const shell = <View style={{ paddingLeft: (phoneNav ? 16 : 9) + (insets.left || 0), paddingRight: 16 + (insets.right || 0) }}>{shellRow}</View>;
   // Stack pages (details, history, lists…) have no tab href; they keep the full height.
-  const bottomNav = phoneNav && activeHref ? <BottomNavBar activeHref={activeHref} menuOpen={open}
+  const bottomNav = phoneNav && activeHref ? <BottomNavBar activeHref={activeHref}
     palette={{ ...shellPalette, indicator: 'rgba(99, 102, 241, 0.32)', accentText: '#ffffff' }}
     bottomInset={insets.bottom || 0}
-    onOpenMenu={() => setOpen(true)}
     onNavigate={key => { setOpen(false); onNavigate?.(key); }} /> : null;
   if (!overlaySearch) return <>{shell}<View style={{ flex: 1, minHeight: 0 }}>{content}</View>{bottomNav}</>;
   // Android also lets detail artwork continue under search; other pages keep the reviewed shell.

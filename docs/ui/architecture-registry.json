@@ -4671,6 +4671,46 @@
           "evidence": "Not run on an Android emulator."
         }
       }
+    },
+    "frontend/ui/cardTitleLines.js": {
+      "components": [
+        "CARD_TITLE_LINES"
+      ],
+      "register": "MEDIA-CARD",
+      "verification": {
+        "web": {
+          "status": "unverified",
+          "evidence": "Not used on web (the .web.js variant applies)."
+        },
+        "ios": {
+          "status": "unverified",
+          "evidence": "Two-line titles; not run on iOS."
+        },
+        "android": {
+          "status": "unverified",
+          "evidence": "Two-line titles seen on a physical Android phone."
+        }
+      }
+    },
+    "frontend/discover/discoverLayout.js": {
+      "components": [
+        "DISCOVER_PHONE_LAYOUT"
+      ],
+      "register": "DISCOVER",
+      "verification": {
+        "web": {
+          "status": "unverified",
+          "evidence": "Not used on web (the .web.js variant applies)."
+        },
+        "ios": {
+          "status": "unverified",
+          "evidence": "Phone layout; not run on iOS."
+        },
+        "android": {
+          "status": "unverified",
+          "evidence": "Rails and bottom Show More seen on a physical Android phone."
+        }
+      }
     }
   },
   "platform": {
@@ -5919,6 +5959,94 @@
         "android": {
           "status": "unverified",
           "evidence": "Implemented in Expo with React Native primitives and native SVG adapters. Current emulator visual and interaction comparison pending."
+        }
+      }
+    },
+    "frontend/ui/cardTitleLines.web.js": {
+      "kind": "adapter",
+      "components": [
+        "CARD_TITLE_LINES"
+      ],
+      "register": "MEDIA-CARD",
+      "purpose": "Web media cards keep one-line titles.",
+      "verification": {
+        "web": {
+          "status": "unverified",
+          "evidence": "Returns 1; no browser pass."
+        },
+        "ios": {
+          "status": "unverified",
+          "evidence": "Not used on iOS."
+        },
+        "android": {
+          "status": "unverified",
+          "evidence": "Not used on Android."
+        }
+      }
+    },
+    "frontend/ui/cardTitleLines.native.js": {
+      "kind": "adapter",
+      "components": [
+        "CARD_TITLE_LINES"
+      ],
+      "register": "MEDIA-CARD",
+      "purpose": "Native media cards give the title two lines, since a phone poster is too narrow for one.",
+      "verification": {
+        "web": {
+          "status": "unverified",
+          "evidence": "Not used on web."
+        },
+        "ios": {
+          "status": "unverified",
+          "evidence": "Not run on iOS."
+        },
+        "android": {
+          "status": "unverified",
+          "evidence": "Two-line titles seen on a physical Android phone."
+        }
+      }
+    },
+    "frontend/discover/discoverLayout.web.js": {
+      "kind": "adapter",
+      "components": [
+        "DISCOVER_PHONE_LAYOUT"
+      ],
+      "register": "DISCOVER",
+      "purpose": "Web Discover keeps its grid, toolbar and amber refresh notice.",
+      "verification": {
+        "web": {
+          "status": "unverified",
+          "evidence": "Returns false; no browser pass."
+        },
+        "ios": {
+          "status": "unverified",
+          "evidence": "Not used on iOS."
+        },
+        "android": {
+          "status": "unverified",
+          "evidence": "Not used on Android."
+        }
+      }
+    },
+    "frontend/discover/discoverLayout.native.js": {
+      "kind": "adapter",
+      "components": [
+        "DISCOVER_PHONE_LAYOUT"
+      ],
+      "register": "DISCOVER",
+      "purpose": "Native Discover uses swipeable rails and a phone toolbar.",
+      "verification": {
+        "web": {
+          "status": "unverified",
+          "evidence": "Not used on web."
+        },
+        "ios": {
+          "status": "unverified",
+          "evidence": "Not run on iOS."
+        },
+        "android": {
+          "status": "unverified",
+          "evidence": "Seen on a physical Android phone."
         }
       }
     }

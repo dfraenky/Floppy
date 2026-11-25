@@ -1,11 +1,17 @@
 import React, { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { DISCOVER_PHONE_LAYOUT } from './discoverLayout';
 import { actionIcons } from '../ui/actionIcons';
 import { Badge } from '../ui/Badge';
 import { Icon } from '../ui/Icon';
 import { MediaCard } from '../ui/MediaCard';
 import { RefreshNotice } from '../ui/RefreshNotice';
 import { Rail } from '../ui/Rail';
+
+// Native (phones): rows are swipeable rails like Home, the background-refresh note is one quiet
+// line, and "Show More Rows" sits after the rows. Web keeps its grid and toolbar.
+const NATIVE = DISCOVER_PHONE_LAYOUT;
+const RAIL_CARD_WIDTH = 140;
 
 const defaultPalette = {
   text: '#fafafa',
@@ -117,9 +123,12 @@ export function DiscoverFeedback({
   const message = toast || {};
   const showToast = Boolean(message.visible && (message.message || message.undoToken));
   return <View style={styles.feedbackStack}>
-    {cacheRefreshing ? <RefreshNotice state="loading" message={copy.refreshBackground}
-      palette={palette} background="rgba(245, 158, 11, 0.12)"
-      border="rgba(245, 158, 11, 0.3)" color={palette.warning} /> : null}
+    {cacheRefreshing ? (NATIVE
+      ? <RefreshNotice state="loading" message={copy.refreshBackground}
+        palette={palette} background={palette.surface} border={palette.surface} color={palette.textMuted} />
+      : <RefreshNotice state="loading" message={copy.refreshBackground}
+        palette={palette} background="rgba(245, 158, 11, 0.12)"
+        border="rgba(245, 158, 11, 0.3)" color={palette.warning} />) : null}
     {status.visible ? <RefreshNotice state="complete" message={status.message || copy.refreshDone}
       labels={{ dismiss: copy.dismiss }} palette={palette}
       background="rgba(16, 185, 129, 0.12)" border="rgba(16, 185, 129, 0.3)"
@@ -232,6 +241,17 @@ export function DiscoverRow({
   const emptyLabel = row.emptyLabel || (row.continueRow ? copy.rowEmptyContinue : copy.rowEmptyDefault);
   const items = row.items || [];
   const squareRow = items[0]?.mediaType === 'podcast' || items[0]?.mediaType === 'music';
+  if (NATIVE) {
+    return <View nativeID={`discover-row-${row.key}`} style={styles.row}>
+      <Rail title={row.title} summary={[row.why, row.matchSignal].filter(Boolean).join(' · ')}
+        items={items} itemWidth={squareRow ? RAIL_CARD_WIDTH : RAIL_CARD_WIDTH}
+        emptyLabel={emptyLabel} scrollLeftLabel="Scroll left" scrollRightLabel="Scroll right" palette={palette}
+        renderItem={item => <DiscoverCard model={squareRow ? { ...item, shape: 'square' } : item} width={RAIL_CARD_WIDTH}
+          square={squareRow} labels={copy} palette={palette}
+          onOpenCard={onOpenCard} onOpenLink={onOpenLink} onAction={onAction} onRate={onRate}
+          renderRating={renderRating} renderActionIcon={renderActionIcon} readOnly={readOnly} />} />
+    </View>;
+  }
   const { cardWidth, gap } = mediaGridMetrics(gridWidth);
   return <View nativeID={`discover-row-${row.key}`} style={styles.row}>
     <View style={styles.rowHeading}>
@@ -404,7 +424,7 @@ export function DiscoverScreen({
   const isHidden = selectedMediaType === 'hidden';
   return <View style={styles.screen}>
     {search}
-    {!isHidden ? <View style={styles.toolbar}>
+    {!isHidden && !NATIVE ? <View style={styles.toolbar}>
       <ToolbarButton label={showMore ? copy.showFewer : copy.showMore}
         primary onPress={onToggleShowMore} disabled={refreshing} palette={palette} />
       <ToolbarButton label={copy.refresh} onPress={onRefresh}
@@ -412,8 +432,16 @@ export function DiscoverScreen({
         <Icon spec={actionIcons.refresh} color={palette.textMuted} size={20} />
       </ToolbarButton>
     </View> : null}
-    <DiscoverTabs items={mediaOptions} selected={selectedMediaType} onSelect={onSelectMedia}
-      label={copy.mediaType} labels={labels} palette={palette} />
+    <View style={NATIVE ? styles.tabsWithAction : null}>
+      <View style={NATIVE ? styles.tabsFill : null}>
+        <DiscoverTabs items={mediaOptions} selected={selectedMediaType} onSelect={onSelectMedia}
+          label={copy.mediaType} labels={labels} palette={palette} />
+      </View>
+      {NATIVE && !isHidden ? <ToolbarButton label={copy.refresh} onPress={onRefresh}
+        disabled={refreshing} palette={palette}>
+        <Icon spec={actionIcons.refresh} color={palette.textMuted} size={18} />
+      </ToolbarButton> : null}
+    </View>
     <DiscoverFeedback refreshing={refreshing} cacheRefreshing={cacheRefreshing && !isHidden}
       refreshStatus={refreshStatus} toast={toast} labels={labels} palette={palette}
       toastStyle={toastStyle} onDismissRefreshStatus={onDismissRefreshStatus}
@@ -426,6 +454,8 @@ export function DiscoverScreen({
       : <DiscoverRows rows={rows} loading={loading} labels={labels} palette={palette}
         onOpenCard={onOpenCard} onOpenLink={onOpenLink} onAction={onAction} onRate={onRate}
         renderRating={renderRating} renderActionIcon={renderActionIcon} />}
+    {NATIVE && !isHidden && rows.length ? <ToolbarButton label={showMore ? copy.showFewer : copy.showMore}
+      onPress={onToggleShowMore} disabled={refreshing} palette={palette} /> : null}
   </View>;
 }
 
@@ -436,6 +466,9 @@ const styles = StyleSheet.create({
   tab: { borderRadius: 9999, borderWidth: 1, paddingHorizontal: 12, paddingVertical: 6 },
   tabText: { fontSize: 14, lineHeight: 20, fontWeight: '400' },
   toolbar: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  // On a phone the refresh button sits at the end of the media chips.
+  tabsWithAction: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  tabsFill: { flex: 1, minWidth: 0 },
   toolbarButton: { minHeight: 36, borderRadius: 6, borderWidth: 1, paddingHorizontal: 12, alignItems: 'center', justifyContent: 'center' },
   toolbarText: { fontSize: 13, fontWeight: '600' },
   refreshGlyph: { fontSize: 18, lineHeight: 20 },

@@ -226,6 +226,9 @@ The iOS `NativeCardMenu.ios.jsx` defines the full rounded `MediaCard` as the sys
 Quick status uses the shared MediaCard and MediaCardActions, the browser card adapter and the Expo MediaCardSlot on Home, Library and Search. Existing fallback consumers and retirement conditions are unchanged. Manual untracked items and non-generic tracking retain their existing flow. Browser search and iOS library rendered; interaction verification and Android runtime verification remain pending separately.
 
 - `frontend/ui/mediaCardQuickStatus.web.js` (browser quick-status transport for the media card)
+- `frontend/ui/cardTitleLines.js`
+- `frontend/ui/cardTitleLines.native.js`
+- `frontend/ui/cardTitleLines.web.js` (title line count: two on native, one on web)
 
 `frontend/ui/mediaCardQuickStatus.web.js` owns browser status transport; Expo uses `expo/app/surfaces/mediaCardTransport.js`. Native long presses use system context menus and iOS system feedback or Android vibration; Expo web retains the shared dropdown because system menus are native-only.
 
@@ -589,6 +592,7 @@ Status: `Partial / coexisting` — Expo uses the shared detail composition; the 
 - 2026-11-23 `absoluteFillObject` removal for React Native 0.88: `frontend/ui/SelectField.jsx`, `frontend/ui/BulkActionBar.native.jsx`, `frontend/ui/People.jsx`, `frontend/ui/PeopleToolbar.jsx`, `frontend/ui/PreferencesForm.jsx`, `frontend/ui/DetailPage.jsx`, `frontend/settings/AppearanceEditor.jsx`, `frontend/users/UsersManagement.jsx`, `expo/app/components/BarcodeScannerModal.jsx`; guard `expo/app/styleSheetCompat.test.mjs`.
 - 2026-11-23 Android accessibility roles: `role` instead of `accessibilityRole` for web-only ARIA roles in `frontend/ui/MediaTable.jsx`, `frontend/ui/SetupGuide.jsx`, `frontend/ui/controls/FeatureList.jsx`, `frontend/ui/AlphabetBar.jsx`, `frontend/ui/BulkActions.jsx`, `frontend/providers/ProviderPageView.jsx`, `frontend/pages/SettingsSidebarView.jsx`, `frontend/errors/ErrorRecovery.jsx`, `expo/app/surfaces/TableSlot.jsx`, `expo/app/surfaces/MediaCardSlot.jsx`; guard in `expo/app/styleSheetCompat.test.mjs`.
 - 2026-11-25 icon and feedback polish: `frontend/ui/actionIcons.js`, `frontend/ui/Rail.jsx`, `frontend/ui/MediaCard.jsx`, `frontend/ui/Shell.jsx`, `frontend/ui/DropdownMenu.jsx`, `frontend/ui/FilterBar.jsx`, `frontend/ui/SelectField.jsx`, `frontend/pages/SettingsView.jsx`, `frontend/ui/CollectionCopies.jsx`, `frontend/ui/MarkdownNotes.jsx`, `expo/app/surfaces/SelectRowPicker.jsx`, `expo/app/components/SheetCloseButton.jsx`, `expo/app/components/saveFeedback.js`, `expo/app/data/libraryTransportCore.js`, `expo/app/data/listTransportCore.js`.
+- 2026-11-25 native cards and Discover: `frontend/ui/MediaCard.jsx` with `frontend/ui/cardTitleLines.js`, `.native.js`, `.web.js` (two-line native titles), `frontend/discover/DiscoverScreen.jsx` (native rails, chip-row refresh, bottom Show More, quiet refresh note), `frontend/pages/DiscoverView.jsx` (subtitle).
 - 2026-11-23 settings save dock: `frontend/pages/SettingsView.jsx` (`onMenuOpenChange`), `expo/app/surfaces/SettingsSaveBar.jsx` (`hidden`), `expo/app/screens/SettingsScreen.jsx`.
 - 2026-11-23 Android back gesture: `expo/App.js` (`BackHandler`).
 - 2026-11-23 game card shape on native: `expo/app/data/libraryTransportCore.js`, `expo/app/data/listTransportCore.js`, `expo/app/screens/ListDetailScreen.jsx`, `frontend/ui/CollectionBrowser.jsx`.
@@ -1362,6 +1366,9 @@ Track dialog layout restore: `TrackForm.jsx`, `TrackFormTabs.jsx`, `SelectField.
 
 - `frontend/auth/AccountSecurity.jsx`
 - `frontend/discover/DiscoverScreen.jsx`
+- `frontend/discover/discoverLayout.js`
+- `frontend/discover/discoverLayout.native.js`
+- `frontend/discover/discoverLayout.web.js` (phone layout switch: native rails and toolbar, web grid)
 - `frontend/discover/mountDiscover.jsx`
 - `frontend/errors/ApiDocs.jsx`
 - `frontend/errors/ErrorRecovery.jsx`

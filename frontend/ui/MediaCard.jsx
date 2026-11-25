@@ -1,6 +1,7 @@
 import { Modal } from './Modal';
 import React, { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { CARD_TITLE_LINES as TITLE_LINES } from './cardTitleLines';
 import { ArtworkImage } from './ArtworkImage';
 import { CardScrim } from './CardScrim';
 import { Icon } from './Icon';
@@ -221,7 +222,7 @@ function Title({ model, palette, onOpen, onOpenLink, onLongPress }) {
       </Pressable>)}
     </View>;
   }
-  const text = <Text numberOfLines={1} style={[styles.title, { color: palette.text }]}>{model.title}</Text>;
+  const text = <Text numberOfLines={TITLE_LINES} style={[styles.title, { color: palette.text }]}>{model.title}</Text>;
   if (!onOpen) return <View style={styles.titleColumn}>{text}</View>;
   return <Pressable accessibilityRole="link" accessibilityLabel={model.title} onPress={onOpen} onLongPress={onLongPress}
     style={styles.titleColumn}>{text}</Pressable>;
@@ -520,7 +521,8 @@ const styles = StyleSheet.create({
   // The web card darkens a fixed 3rem above its body, not a percentage of the
   // body, so square and 2:3 cards read the same.
   scrim: { position: 'absolute', left: 0, right: 0, bottom: 0, top: -48, zIndex: 0 },
-  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 4, minWidth: 0 },
+  // A two-line title keeps the info and rating beside its first line.
+  titleRow: { flexDirection: 'row', alignItems: TITLE_LINES > 1 ? 'flex-start' : 'center', gap: 4, minWidth: 0 },
   titleColumn: { flex: 1, minWidth: 0 },
   titleLinkPress: { minWidth: 0 },
   title: { fontSize: 14, fontWeight: '600', lineHeight: 18 },

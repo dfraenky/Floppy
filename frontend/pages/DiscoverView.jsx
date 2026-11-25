@@ -9,7 +9,7 @@ import { DiscoverScreen } from '../discover/DiscoverScreen';
 
 export const discoverLabels = {
   title: 'Discover',
-  subtitle: '[UNDER CONSTRUCTION] Recommendations powered by global trends and your local activity.',
+  subtitle: 'Recommendations from global trends and what you watch, read and play.',
   retry: 'Try again',
   error: 'Discover could not be loaded.',
 };

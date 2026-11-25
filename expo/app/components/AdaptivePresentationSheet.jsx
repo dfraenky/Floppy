@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { SheetCloseButton } from './SheetCloseButton';
 import { SheetContainer, SheetHost, useNativeSheetClose } from './SheetHost';
 import { useSheetInsets } from './useSheetInsets';
@@ -8,10 +8,13 @@ import { RailModalHost, RailModalProvider } from '../../../frontend/ui/Modal';
 
 // The system places the rail's close button at the sheet's top inset, this far above the centre of the 80pt header row.
 const NATIVE_CLOSE_LIFT = 16;
-// Android's native sheet offers half and full states rather than arbitrary detents.
+// Android's native sheet offers half and full states rather than arbitrary detents. A half-height
+// Material sheet cut forms such as Tracking off mid-row, so Android opens expanded (below the
+// status bar, rounded top corners, swipe down to close), as Material 3 does for task sheets.
+const DEFAULT_SNAP_POINTS = Platform.OS === 'android' ? ['full'] : ['half', 'full'];
 // children may be a function of { rail }: true when railItems sit in the system rail, so the
 // body can drop its own control for them.
-export function AdaptivePresentationSheet({ children, title, onClose, titleColor = '#fff', snapPoints = ['half', 'full'],
+export function AdaptivePresentationSheet({ children, title, onClose, titleColor = '#fff', snapPoints = DEFAULT_SNAP_POINTS,
   railItems, railValue, onRailChange, ...props }) {
   const insets = useSheetInsets();
   const railEdge = useNativeSheetClose(insets);

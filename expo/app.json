@@ -3,7 +3,7 @@
     "name": "Floppy",
     "slug": "floppy-expo",
     "scheme": "floppy-expo",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "userInterfaceStyle": "automatic",
     "ios": {
       "bundleIdentifier": "app.floppy.nativeproof",
@@ -27,7 +27,7 @@
         "foregroundImage": "./assets/adaptive-icon-foreground.png",
         "backgroundColor": "#1e1b4b"
       },
-      "versionCode": 4
+      "versionCode": 5
     },
     "experiments": {
       "baseUrl": "/static/expo"

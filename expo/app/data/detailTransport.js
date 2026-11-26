@@ -115,10 +115,10 @@ export async function loadCollectionEntries(identity) {
   const stats = payload?.stats;
   const counts = [];
   if (stats && identity.mediaType !== 'season' && identity.mediaType !== 'episode') {
-    counts.push({ label: 'COLLECTED SEASONS', value: collectedLine(stats.collected_seasons || 0, stats.total_seasons || 0) });
+    counts.push({ label: 'Collected seasons', value: collectedLine(stats.collected_seasons || 0, stats.total_seasons || 0) });
   }
   if (stats) {
-    counts.push({ label: 'COLLECTED EPISODES', value: collectedLine(stats.collected_episodes || 0, stats.total_episodes || 0) });
+    counts.push({ label: 'Collected episodes', value: collectedLine(stats.collected_episodes || 0, stats.total_episodes || 0) });
   }
   return {
     counts,

@@ -1086,12 +1086,14 @@ function createStyles(colors, compact) {
       paddingHorizontal: 0,
       paddingVertical: 0,
       borderRadius: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      // On a phone the number sits over the whole cover; a deeper scrim and a soft text shadow
+      // keep it readable on bright artwork.
+      backgroundColor: 'rgba(0, 0, 0, 0.62)',
       justifyContent: 'center',
     },
     dayNumberToday: { backgroundColor: colors.accentStrong },
     dayNumberText: { color: '#ffffff', fontSize: 12, fontWeight: '500' },
-    dayNumberTextCompact: { fontSize: 16, fontWeight: '600' },
+    dayNumberTextCompact: { fontSize: 16, fontWeight: '700', textShadowColor: 'rgba(0, 0, 0, 0.85)', textShadowRadius: 3, textShadowOffset: { width: 0, height: 1 } },
     moreBadge: {
       position: 'absolute',
       bottom: 4,

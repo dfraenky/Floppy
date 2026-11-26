@@ -26,12 +26,29 @@ export default function SettingsSaveBar(props) {
   // The ref supplies the current action; the serializable presentation drives
   // updates (dirty, saving, errors, translated copy and theme colors).
   const signature = JSON.stringify(props);
+  // The dock only appears while there is something to do or to report: unsaved changes, a
+  // save in flight, an error, and for two seconds after a save ("All changes saved").
+  // A permanent "All changes saved" card covered the end of every settings page.
+  const pending = Boolean(props.dirty || props.saving || props.error || props.appearance);
+  const [justSaved, setJustSaved] = useState(false);
+  const wasPending = useRef(pending);
+  useEffect(() => {
+    if (wasPending.current && !pending) {
+      setJustSaved(true);
+      const timer = setTimeout(() => setJustSaved(false), 2000);
+      wasPending.current = pending;
+      return () => clearTimeout(timer);
+    }
+    wasPending.current = pending;
+    return undefined;
+  }, [pending]);
+  const visible = pending || justSaved;
   useEffect(() => {
     if (!setBar) return undefined;
-    setBar(<FormSaveBar {...latest.current} onSave={() => latest.current.onSave?.()} />);
+    setBar(visible ? <FormSaveBar {...latest.current} onSave={() => latest.current.onSave?.()} /> : null);
     return () => setBar(null);
-  }, [setBar, signature]);
-  return setBar ? null : <FormSaveBar {...props} />;
+  }, [setBar, signature, visible]);
+  return setBar || !visible ? null : <FormSaveBar {...props} />;
 }
 
 const styles = StyleSheet.create({

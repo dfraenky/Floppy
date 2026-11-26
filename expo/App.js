@@ -58,10 +58,15 @@ export default function App() {
   const [tab, setTab] = useState('home');
   const [libraryType, setLibraryType] = useState('movie');
   // The Library tab opens the media type used last, across launches.
+  // Saving waits for the stored value to load, or the default would overwrite it at launch.
+  const libraryTypeLoaded = useRef(false);
   useEffect(() => {
-    loadLastLibraryType().then(value => { if (value) setLibraryType(value); });
+    loadLastLibraryType().then(value => {
+      if (value) setLibraryType(value);
+      libraryTypeLoaded.current = true;
+    });
   }, []);
-  useEffect(() => { saveLastLibraryType(libraryType); }, [libraryType]);
+  useEffect(() => { if (libraryTypeLoaded.current) saveLastLibraryType(libraryType); }, [libraryType]);
   // Switching types from the Library chips stays on one tab: no back-history entry per type.
   const switchLibraryType = mediaType => { setStack([]); setLibraryType(mediaType); };
   const [stack, setStack] = useState([]);

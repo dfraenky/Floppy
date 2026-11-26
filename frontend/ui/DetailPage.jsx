@@ -23,8 +23,17 @@ function QuickButton({ item, palette, inline }) {
       borderColor: item.active ? palette.accent : (palette.surfaceBorder || palette.border),
       opacity: item.disabled ? 0.5 : 1,
     }]}>
-    <Icon spec={actionIcons[item.icon]} size={16} color={item.active ? palette.accent : palette.text} />
+    <Icon spec={actionIcons[item.icon]} size={inline ? 16 : 18} color={item.active ? palette.accent : palette.text} />
+    {/* On a phone the row is full width, so each icon carries a one-word caption. */}
+    {inline ? null : <Text numberOfLines={1} style={[styles.quickLabel, { color: palette.textMuted }]}>{quickCaption(item)}</Text>}
   </Pressable>;
+}
+
+// Short captions for the phone row; the full label stays the accessibility label.
+const QUICK_CAPTIONS = { source: 'Links', links: 'Links', tags: 'Tags', notes: 'Notes', lists: 'Lists', seerr: 'Seerr',
+  history: 'History', sync: 'Sync', more: 'More', edition: 'Edition' };
+function quickCaption(item) {
+  return item.caption || QUICK_CAPTIONS[item.key] || String(item.label || '').split(' ')[0];
 }
 
 export function DetailActionBar({ primary, edit, quick = [], palette, inlineAt = 768 }) {
@@ -418,8 +427,9 @@ const styles = StyleSheet.create({
   actionBar: { gap: 12 },
   actionBarInline: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' },
   quickRow: { flexDirection: 'row', gap: 8 },
-  quick: { flex: 1, minHeight: 44, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  quickInline: { flex: 0, width: 44 },
+  quick: { flex: 1, minHeight: 56, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center', gap: 3, paddingHorizontal: 2 },
+  quickLabel: { fontSize: 11, lineHeight: 14, fontWeight: '500' },
+  quickInline: { flex: 0, width: 44, minHeight: 44 },
   quickGlyph: { fontSize: 18, fontWeight: '600' },
   linkRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   linkButton: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8 },
